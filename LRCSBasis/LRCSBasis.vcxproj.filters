@@ -1,0 +1,591 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\AM">
+      <UniqueIdentifier>{4c9815b6-e281-42f9-a098-51e8a7343b81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\AM">
+      <UniqueIdentifier>{43b498f2-b559-47b7-b92b-6d23493c6e68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CoreObjects">
+      <UniqueIdentifier>{38828667-6085-452f-87d6-6bffd6cf52ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CoreObjects\Cursor">
+      <UniqueIdentifier>{a7dde1d5-3b55-48b1-8318-78dfd2e48ccf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CoreObjects\Block">
+      <UniqueIdentifier>{180be3ef-9de7-4453-b96a-429ea9240809}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CoreObjects\Exceptions">
+      <UniqueIdentifier>{8440048f-8a3c-498c-8380-4e3b08e89574}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CoreObjects\Util">
+      <UniqueIdentifier>{b3cc53b7-ca31-4e69-92e5-e71185a3a3df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CoreObjects\ValPos">
+      <UniqueIdentifier>{188578bb-a23d-4182-a1cb-0806e9779b92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CoreObjects\Operator">
+      <UniqueIdentifier>{8c776291-7adc-4606-940d-4915c4195db0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Wrapper">
+      <UniqueIdentifier>{966f34b7-9987-41e7-9d08-2aec490d1170}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Wrapper\Encoder">
+      <UniqueIdentifier>{0eb1bc92-54ba-4889-aef5-5e2ad902f6c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Wrapper\Decoder">
+      <UniqueIdentifier>{e666c187-e374-4e5a-b8f8-ac00b1073051}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Wrapper\Writer">
+      <UniqueIdentifier>{67cbdc35-36c9-4381-853e-c37421937141}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Wrapper\Reader">
+      <UniqueIdentifier>{19a384ee-c4c3-49eb-9e2c-5f0bc6400bcb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\QueryInterface">
+      <UniqueIdentifier>{44de091e-45a1-4bcb-9d75-56621d8cda2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\QueryInterface\DataSource">
+      <UniqueIdentifier>{414674e0-2c80-4561-82e2-1208fd52c18b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\IndexingInterface">
+      <UniqueIdentifier>{bf11665d-93c8-4944-b138-f8a016e6d4b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CoreObjects">
+      <UniqueIdentifier>{ea1830e2-cf32-43c6-b42d-eedf614618e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CoreObjects\Block">
+      <UniqueIdentifier>{590b06c7-3f15-4953-8305-b95bc4fa1f31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CoreObjects\Cursor">
+      <UniqueIdentifier>{12d5c59e-5c11-4032-95bc-159cf089453e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CoreObjects\Exceptions">
+      <UniqueIdentifier>{f868c8b0-8af8-44c7-80b3-9c72032ff343}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CoreObjects\Operator">
+      <UniqueIdentifier>{3bda776e-ab39-4d4a-a789-43644fdd35ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CoreObjects\Util">
+      <UniqueIdentifier>{878509bf-14d2-4138-aae4-b5fbf9a0dd79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CoreObjects\ValPos">
+      <UniqueIdentifier>{d3c87c34-2eed-47ed-84e4-f0e699ff38f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Wrapper">
+      <UniqueIdentifier>{292912d1-1505-4b63-9fc0-e4a237cd5b51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Wrapper\Decoder">
+      <UniqueIdentifier>{46f6b1e2-e0aa-44ee-b085-9cdc30eabc16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Wrapper\Encoder">
+      <UniqueIdentifier>{4a3832e8-4b36-48a0-a674-c73a26764d9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Wrapper\Reader">
+      <UniqueIdentifier>{ab3059bf-50ef-420c-b571-7aeb1223a660}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Wrapper\Writer">
+      <UniqueIdentifier>{ab7230a6-7b7c-45b9-93d8-d6fbf0c2b3cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\IndexingInterface">
+      <UniqueIdentifier>{0a6e393e-2757-47a4-a49f-78ae3356d4e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\QueryInterface">
+      <UniqueIdentifier>{43b0cdd1-41aa-4e45-80ed-d325ed944e43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\QueryInterface\DataSource">
+      <UniqueIdentifier>{12fd4f91-f28e-45d5-8fdd-b6782dc40508}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CoreObjects\Projection">
+      <UniqueIdentifier>{170f2874-cb54-485f-8c6f-81ab7c309e6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CoreObjects\Projection">
+      <UniqueIdentifier>{33e3a413-522b-4c57-86e3-56298a01e1ea}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Operator.h">
+      <Filter>Header Files\CoreObjects\Operator</Filter>
+    </ClInclude>
+    <ClInclude Include="Exception.h">
+      <Filter>Header Files\CoreObjects\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="UnexpectedException.h">
+      <Filter>Header Files\CoreObjects\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="AccessException.h">
+      <Filter>Header Files\CoreObjects\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="CodingException.h">
+      <Filter>Header Files\CoreObjects\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="UnimplementedException.h">
+      <Filter>Header Files\CoreObjects\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="PosOperator.h">
+      <Filter>Header Files\CoreObjects\Operator</Filter>
+    </ClInclude>
+    <ClInclude Include="ValPos.h">
+      <Filter>Header Files\CoreObjects\ValPos</Filter>
+    </ClInclude>
+    <ClInclude Include="LongValPos.h">
+      <Filter>Header Files\CoreObjects\ValPos</Filter>
+    </ClInclude>
+    <ClInclude Include="NullValPos.h">
+      <Filter>Header Files\CoreObjects\ValPos</Filter>
+    </ClInclude>
+    <ClInclude Include="StringValPos.h">
+      <Filter>Header Files\CoreObjects\ValPos</Filter>
+    </ClInclude>
+    <ClInclude Include="DoubleValPos.h">
+      <Filter>Header Files\CoreObjects\ValPos</Filter>
+    </ClInclude>
+    <ClInclude Include="FloatValPos.h">
+      <Filter>Header Files\CoreObjects\ValPos</Filter>
+    </ClInclude>
+    <ClInclude Include="IntValPos.h">
+      <Filter>Header Files\CoreObjects\ValPos</Filter>
+    </ClInclude>
+    <ClInclude Include="Block.h">
+      <Filter>Header Files\CoreObjects\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="RLEBlock.h">
+      <Filter>Header Files\CoreObjects\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="BasicBlock.h">
+      <Filter>Header Files\CoreObjects\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="BitBlock.h">
+      <Filter>Header Files\CoreObjects\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="MultiBlock.h">
+      <Filter>Header Files\CoreObjects\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="PosBlock.h">
+      <Filter>Header Files\CoreObjects\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="PosFilterBlock.h">
+      <Filter>Header Files\CoreObjects\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="Predicate.h">
+      <Filter>Header Files\CoreObjects\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Constants.h">
+      <Filter>Header Files\CoreObjects\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="MultiPosFilterCursor.h">
+      <Filter>Header Files\CoreObjects\Cursor</Filter>
+    </ClInclude>
+    <ClInclude Include="PosFilterCursor.h">
+      <Filter>Header Files\CoreObjects\Cursor</Filter>
+    </ClInclude>
+    <ClInclude Include="Cursor.h">
+      <Filter>Header Files\CoreObjects\Cursor</Filter>
+    </ClInclude>
+    <ClInclude Include="MultiPosFilterBlock.h">
+      <Filter>Header Files\CoreObjects\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="BitUtil.h">
+      <Filter>Header Files\CoreObjects\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="HashFunction.h">
+      <Filter>Header Files\CoreObjects\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="HashMap.h">
+      <Filter>Header Files\CoreObjects\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Log.h">
+      <Filter>Header Files\CoreObjects\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="StopWatch.h">
+      <Filter>Header Files\CoreObjects\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util.h">
+      <Filter>Header Files\CoreObjects\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="CompareRoutine.h">
+      <Filter>Header Files\CoreObjects\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="StringUtil.h">
+      <Filter>Header Files\CoreObjects\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="IntWriter.h">
+      <Filter>Header Files\Wrapper\Writer</Filter>
+    </ClInclude>
+    <ClInclude Include="Writer.h">
+      <Filter>Header Files\Wrapper\Writer</Filter>
+    </ClInclude>
+    <ClInclude Include="StringWriter.h">
+      <Filter>Header Files\Wrapper\Writer</Filter>
+    </ClInclude>
+    <ClInclude Include="BitReader.h">
+      <Filter>Header Files\Wrapper\Reader</Filter>
+    </ClInclude>
+    <ClInclude Include="RLETriple.h">
+      <Filter>Header Files\CoreObjects\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="AM.h">
+      <Filter>Header Files\AM</Filter>
+    </ClInclude>
+    <ClInclude Include="ROSAM.h">
+      <Filter>Header Files\AM</Filter>
+    </ClInclude>
+    <ClInclude Include="BitmapDataSource.h">
+      <Filter>Header Files\QueryInterface\DataSource</Filter>
+    </ClInclude>
+    <ClInclude Include="BitmapDecoder.h">
+      <Filter>Header Files\Wrapper\Decoder</Filter>
+    </ClInclude>
+    <ClInclude Include="BitmapEncoder.h">
+      <Filter>Header Files\Wrapper\Encoder</Filter>
+    </ClInclude>
+    <ClInclude Include="BlockPrinter.h">
+      <Filter>Header Files\QueryInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="ColumnExtracter.h">
+      <Filter>Header Files\IndexingInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="Decoder.h">
+      <Filter>Header Files\Wrapper\Decoder</Filter>
+    </ClInclude>
+    <ClInclude Include="Encoder.h">
+      <Filter>Header Files\Wrapper\Encoder</Filter>
+    </ClInclude>
+    <ClInclude Include="IntDecoder.h">
+      <Filter>Header Files\Wrapper\Decoder</Filter>
+    </ClInclude>
+    <ClInclude Include="IntEncoder.h">
+      <Filter>Header Files\Wrapper\Encoder</Filter>
+    </ClInclude>
+    <ClInclude Include="IntReader.h">
+      <Filter>Header Files\Wrapper\Reader</Filter>
+    </ClInclude>
+    <ClInclude Include="DataSource.h">
+      <Filter>Header Files\QueryInterface\DataSource</Filter>
+    </ClInclude>
+    <ClInclude Include="LZDataSource.h">
+      <Filter>Header Files\QueryInterface\DataSource</Filter>
+    </ClInclude>
+    <ClInclude Include="LZDecoder.h">
+      <Filter>Header Files\Wrapper\Decoder</Filter>
+    </ClInclude>
+    <ClInclude Include="LZEncoder.h">
+      <Filter>Header Files\Wrapper\Encoder</Filter>
+    </ClInclude>
+    <ClInclude Include="PosDecoder.h">
+      <Filter>Header Files\Wrapper\Decoder</Filter>
+    </ClInclude>
+    <ClInclude Include="PosEncoder.h">
+      <Filter>Header Files\Wrapper\Encoder</Filter>
+    </ClInclude>
+    <ClInclude Include="RLEDecoder.h">
+      <Filter>Header Files\Wrapper\Decoder</Filter>
+    </ClInclude>
+    <ClInclude Include="RLEncoder.h">
+      <Filter>Header Files\Wrapper\Encoder</Filter>
+    </ClInclude>
+    <ClInclude Include="RLESuperDecoder.h">
+      <Filter>Header Files\Wrapper\Decoder</Filter>
+    </ClInclude>
+    <ClInclude Include="SColumnExtracter.h">
+      <Filter>Header Files\IndexingInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="PagePlacer.h">
+      <Filter>Header Files\IndexingInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="PageWriter.h">
+      <Filter>Header Files\AM</Filter>
+    </ClInclude>
+    <ClInclude Include="RLEDataSource.h">
+      <Filter>Header Files\QueryInterface\DataSource</Filter>
+    </ClInclude>
+    <ClInclude Include="StringDataSource.h">
+      <Filter>Header Files\QueryInterface\DataSource</Filter>
+    </ClInclude>
+    <ClInclude Include="StringDecoder.h">
+      <Filter>Header Files\Wrapper\Decoder</Filter>
+    </ClInclude>
+    <ClInclude Include="StringEncoder.h">
+      <Filter>Header Files\Wrapper\Encoder</Filter>
+    </ClInclude>
+    <ClInclude Include="StringReader.h">
+      <Filter>Header Files\Wrapper\Reader</Filter>
+    </ClInclude>
+    <ClInclude Include="UncompressedDecoder.h">
+      <Filter>Header Files\Wrapper\Decoder</Filter>
+    </ClInclude>
+    <ClInclude Include="UncompressedEncoder.h">
+      <Filter>Header Files\Wrapper\Encoder</Filter>
+    </ClInclude>
+    <ClInclude Include="BDBEnv.h">
+      <Filter>Header Files\AM</Filter>
+    </ClInclude>
+    <ClInclude Include="SysDbEnv.h">
+      <Filter>Header Files\AM</Filter>
+    </ClInclude>
+    <ClInclude Include="GUIDGen.h">
+      <Filter>Header Files\CoreObjects\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="ProjMaker.h">
+      <Filter>Header Files\AM</Filter>
+    </ClInclude>
+    <ClInclude Include="SysTime.h">
+      <Filter>Header Files\CoreObjects\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Projection.h">
+      <Filter>Header Files\CoreObjects\Projection</Filter>
+    </ClInclude>
+    <ClInclude Include="StringColumnCreator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LRCSBasis.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Operator.cpp">
+      <Filter>Source Files\CoreObjects\Operator</Filter>
+    </ClCompile>
+    <ClCompile Include="Exception.cpp">
+      <Filter>Source Files\CoreObjects\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="UnexpectedException.cpp">
+      <Filter>Source Files\CoreObjects\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="AccessException.cpp">
+      <Filter>Source Files\CoreObjects\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="CodingException.cpp">
+      <Filter>Source Files\CoreObjects\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="UnimplementedException.cpp">
+      <Filter>Source Files\CoreObjects\Exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="PosOperator.cpp">
+      <Filter>Source Files\CoreObjects\Operator</Filter>
+    </ClCompile>
+    <ClCompile Include="ValPos.cpp">
+      <Filter>Source Files\CoreObjects\ValPos</Filter>
+    </ClCompile>
+    <ClCompile Include="StringValPos.cpp">
+      <Filter>Source Files\CoreObjects\ValPos</Filter>
+    </ClCompile>
+    <ClCompile Include="NullValPos.cpp">
+      <Filter>Source Files\CoreObjects\ValPos</Filter>
+    </ClCompile>
+    <ClCompile Include="LongValPos.cpp">
+      <Filter>Source Files\CoreObjects\ValPos</Filter>
+    </ClCompile>
+    <ClCompile Include="DoubleValPos.cpp">
+      <Filter>Source Files\CoreObjects\ValPos</Filter>
+    </ClCompile>
+    <ClCompile Include="FloatValPos.cpp">
+      <Filter>Source Files\CoreObjects\ValPos</Filter>
+    </ClCompile>
+    <ClCompile Include="IntValPos.cpp">
+      <Filter>Source Files\CoreObjects\ValPos</Filter>
+    </ClCompile>
+    <ClCompile Include="Block.cpp">
+      <Filter>Source Files\CoreObjects\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="BasicBlock.cpp">
+      <Filter>Source Files\CoreObjects\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="BitBlock.cpp">
+      <Filter>Source Files\CoreObjects\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="MultiBlock.cpp">
+      <Filter>Source Files\CoreObjects\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="PosBlock.cpp">
+      <Filter>Source Files\CoreObjects\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="PosFilterBlock.cpp">
+      <Filter>Source Files\CoreObjects\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="RLEBlock.cpp">
+      <Filter>Source Files\CoreObjects\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="Predicate.cpp">
+      <Filter>Source Files\CoreObjects\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="MultiPosFilterCursor.cpp">
+      <Filter>Source Files\CoreObjects\Cursor</Filter>
+    </ClCompile>
+    <ClCompile Include="PosFilterCursor.cpp">
+      <Filter>Source Files\CoreObjects\Cursor</Filter>
+    </ClCompile>
+    <ClCompile Include="Cursor.cpp">
+      <Filter>Source Files\CoreObjects\Cursor</Filter>
+    </ClCompile>
+    <ClCompile Include="MultiPosFilterBlock.cpp">
+      <Filter>Source Files\CoreObjects\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="BitUtil.cpp">
+      <Filter>Source Files\CoreObjects\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="HashMap.cpp">
+      <Filter>Source Files\CoreObjects\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Log.cpp">
+      <Filter>Source Files\CoreObjects\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="StopWatch.cpp">
+      <Filter>Source Files\CoreObjects\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CompareRoutine.cpp">
+      <Filter>Source Files\CoreObjects\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="StringUtil.cpp">
+      <Filter>Source Files\CoreObjects\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="IntWriter.cpp">
+      <Filter>Source Files\Wrapper\Writer</Filter>
+    </ClCompile>
+    <ClCompile Include="BitReader.cpp">
+      <Filter>Source Files\Wrapper\Reader</Filter>
+    </ClCompile>
+    <ClCompile Include="Writer.cpp">
+      <Filter>Source Files\Wrapper\Writer</Filter>
+    </ClCompile>
+    <ClCompile Include="StringWriter.cpp">
+      <Filter>Source Files\Wrapper\Writer</Filter>
+    </ClCompile>
+    <ClCompile Include="BitmapDataSource.cpp">
+      <Filter>Source Files\QueryInterface\DataSource</Filter>
+    </ClCompile>
+    <ClCompile Include="AM.cpp">
+      <Filter>Source Files\AM</Filter>
+    </ClCompile>
+    <ClCompile Include="BitmapDecoder.cpp">
+      <Filter>Source Files\Wrapper\Decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="BitmapEncoder.cpp">
+      <Filter>Source Files\Wrapper\Encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="ColumnExtracter.cpp">
+      <Filter>Source Files\IndexingInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="BlockPrinter.cpp">
+      <Filter>Source Files\QueryInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="DataSource.cpp">
+      <Filter>Source Files\QueryInterface\DataSource</Filter>
+    </ClCompile>
+    <ClCompile Include="LZDataSource.cpp">
+      <Filter>Source Files\QueryInterface\DataSource</Filter>
+    </ClCompile>
+    <ClCompile Include="RLEDataSource.cpp">
+      <Filter>Source Files\QueryInterface\DataSource</Filter>
+    </ClCompile>
+    <ClCompile Include="PageWriter.cpp">
+      <Filter>Source Files\AM</Filter>
+    </ClCompile>
+    <ClCompile Include="ROSAM.cpp">
+      <Filter>Source Files\AM</Filter>
+    </ClCompile>
+    <ClCompile Include="PagePlacer.cpp">
+      <Filter>Source Files\IndexingInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="SColumnExtracter.cpp">
+      <Filter>Source Files\IndexingInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="Decoder.cpp">
+      <Filter>Source Files\Wrapper\Decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="Encoder.cpp">
+      <Filter>Source Files\Wrapper\Encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="IntDecoder.cpp">
+      <Filter>Source Files\Wrapper\Decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="IntEncoder.cpp">
+      <Filter>Source Files\Wrapper\Encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="LZDecoder.cpp">
+      <Filter>Source Files\Wrapper\Decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="LZEncoder.cpp">
+      <Filter>Source Files\Wrapper\Encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="IntReader.cpp">
+      <Filter>Source Files\Wrapper\Reader</Filter>
+    </ClCompile>
+    <ClCompile Include="PosDecoder.cpp">
+      <Filter>Source Files\Wrapper\Decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="PosEncoder.cpp">
+      <Filter>Source Files\Wrapper\Encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="RLEDecoder.cpp">
+      <Filter>Source Files\Wrapper\Decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="RLEncoder.cpp">
+      <Filter>Source Files\Wrapper\Encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="StringDecoder.cpp">
+      <Filter>Source Files\Wrapper\Decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="StringEncoder.cpp">
+      <Filter>Source Files\Wrapper\Encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="UncompressedDecoder.cpp">
+      <Filter>Source Files\Wrapper\Decoder</Filter>
+    </ClCompile>
+    <ClCompile Include="UncompressedEncoder.cpp">
+      <Filter>Source Files\Wrapper\Encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="StringReader.cpp">
+      <Filter>Source Files\Wrapper\Reader</Filter>
+    </ClCompile>
+    <ClCompile Include="StringDataSource.cpp">
+      <Filter>Source Files\QueryInterface\DataSource</Filter>
+    </ClCompile>
+    <ClCompile Include="BDBEnv.cpp">
+      <Filter>Source Files\AM</Filter>
+    </ClCompile>
+    <ClCompile Include="SysDbEnv.cpp">
+      <Filter>Source Files\AM</Filter>
+    </ClCompile>
+    <ClCompile Include="GUIDGen.cpp">
+      <Filter>Source Files\CoreObjects\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="SysTime.cpp">
+      <Filter>Source Files\CoreObjects\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="ProjMaker.cpp">
+      <Filter>Source Files\AM</Filter>
+    </ClCompile>
+    <ClCompile Include="Projection.cpp">
+      <Filter>Source Files\CoreObjects\Projection</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

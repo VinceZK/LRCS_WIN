@@ -1,0 +1,15 @@
+#Most of the configuration information that can be specified to 
+#DB_ENV methods can also be specified using this configuration file. 
+#If an environment home directory has been specified, 
+#any file named DB_CONFIG in the database home directory will be 
+#read for lines of the format NAME VALUE.
+
+#One or more whitespace characters are used to delimit the two parts of the line, 
+#and trailing whitespace characters are discarded. 
+#All empty lines or lines whose first character is a whitespace or hash (#) character will be ignored.
+#Each line must specify both the NAME and the VALUE of the pair. 
+#The specific NAME VALUE pairs are documented in the manual for the corresponding methods
+
+set_data_dir ../RuntimeData/
+set_cachesize 0 10485760 1
+set_tx_max 100
