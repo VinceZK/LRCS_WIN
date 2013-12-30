@@ -1,4 +1,5 @@
 #pragma once
+
 #include "AM.h"
 #include "SColumnExtracter.h"
 #include "StringEncoder.h"

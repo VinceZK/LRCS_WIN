@@ -1,4 +1,11 @@
 #pragma once
+
+#ifdef LRCSBASIS_EXPORTS
+#define LRCSBasis_API __declspec(dllexport)
+#else
+#define LRCSBasis_API __declspec(dllimport)
+#endif
+
 #include "MultiPosFilterBlock.h"
 #include "assert.h"
 #include <stdlib.h>
@@ -10,7 +17,7 @@ struct  whereOp
 	whereOp* nextOp;
 };
 
-class PosOperator
+class LRCSBasis_API PosOperator
 {
 public:
 	PosOperator();

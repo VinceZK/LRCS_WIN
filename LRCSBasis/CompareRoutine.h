@@ -1,7 +1,14 @@
 #pragma once
+
+#ifdef LRCSBASIS_EXPORTS
+#define LRCSBasis_API __declspec(dllexport)
+#else
+#define LRCSBasis_API __declspec(dllimport)
+#endif
+
 #include <db_cxx.h>
 
-class  CompareRoutine
+class LRCSBasis_API CompareRoutine
 {
 public:
 	CompareRoutine();

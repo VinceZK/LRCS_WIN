@@ -1,4 +1,11 @@
 #pragma once
+
+#ifdef LRCSBASIS_EXPORTS
+#define LRCSBasis_API __declspec(dllexport)
+#else
+#define LRCSBasis_API __declspec(dllimport)
+#endif
+
 #include "Constants.h"
 #include "Predicate.h"
 #include "IntValPos.h"
@@ -11,7 +18,7 @@
 //#include "PosBlockArray.h"
 
 // Interface for data object passed between operators
-class  Block {
+class LRCSBasis_API Block {
 public:
 	Block();
 	Block(const Block&);

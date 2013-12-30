@@ -1,8 +1,14 @@
 #pragma once
+
+#ifdef LRCSBASIS_EXPORTS
+#define LRCSBasis_API __declspec(dllexport)
+#else
+#define LRCSBasis_API __declspec(dllimport)
+#endif
 //Abstract Class to define a cursor
 #include "Constants.h"
 
-class Cursor
+class LRCSBasis_API Cursor
 {
 public:
 	Cursor();

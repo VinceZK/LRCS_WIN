@@ -1,4 +1,11 @@
 #pragma once
+
+#ifdef LRCSBASIS_EXPORTS
+#define LRCSBasis_API __declspec(dllexport)
+#else
+#define LRCSBasis_API __declspec(dllimport)
+#endif
+
 #include "PosFilterBlock.h"
 #include <vector>
 #include "assert.h"
@@ -8,7 +15,7 @@ using namespace std;
 
 class MultiPosFilterCursor;
 
-class MultiPosFilterBlock
+class LRCSBasis_API MultiPosFilterBlock
 {
 public:
 	MultiPosFilterBlock();
