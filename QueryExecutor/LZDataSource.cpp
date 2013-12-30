@@ -5,41 +5,41 @@
 LZDataSource::LZDataSource(AM* am_, bool valSorted_, bool isROS, Decoder* decoder_)
 : DataSource(am_, isROS)
 {
-	valSorted = valSorted_;
-	decoder = new LZDecoder(decoder_);
+	m_bValSorted = valSorted_;
+	m_pDecoder = new LZDecoder(decoder_);
 }
 
 
 LZDataSource::~LZDataSource()
 {
 
-	if (decoder != NULL) delete decoder;
+	if (m_pDecoder != NULL) delete m_pDecoder;
 	//if (currBlock!=NULL) delete currBlock;
 }
 
 //Get the position block on predicaiton
 MultiPosFilterBlock* LZDataSource::getPosOnPred(){
-	matchedPredPos = new MultiPosFilterBlock();
-	if (pred == NULL)matchedPredPos->setCompleteSet(true);
+	m_pMatchedPredPos = new MultiPosFilterBlock();
+	if (m_pPred == NULL)m_pMatchedPredPos->setCompleteSet(true);
 	else{
-		predChanged = false;//Reset predChanged
+		m_bPredChanged = false;//Reset predChanged
 
-		ValPos* rhsvp = pred->getRHS();
+		ValPos* rhsvp = m_pPred->getRHS();
 		char* rhsval = (char*)rhsvp->value;
 		ValPos* tempVP = rhsvp->clone();
-		int valsize = pred->getRHS()->getSize();
+		int valsize = m_pPred->getRHS()->getSize();
 		unsigned char* temp;
 		temp = StringUtil::getSmallestLargerValue(rhsval, valsize);
 		tempVP->set(temp);
 
-		if (valSorted) {
+		if (m_bValSorted) {
 			getPosOnPredValueSorted(rhsvp, tempVP);
 		}
 		else {// The column is not value sorted
-			getPosOnPredValueUnsorted((ROSAM*)am, rhsvp, tempVP);
+			getPosOnPredValueUnsorted((ROSAM*)m_pAM, rhsvp, tempVP);
 		}
 	}
-	return matchedPredPos;
+	return m_pMatchedPredPos;
 }
 
 //printColumn, print to stringstream instead. For testing purpose

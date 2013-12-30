@@ -47,23 +47,23 @@ public:
 	virtual int getLastPosition();
 
 protected:
-	AM* am;
-	Predicate* pred;
-	Decoder* decoder;
-	MultiBlock* currBlock;
+	AM* m_pAM;
+	Predicate* m_pPred;
+	Decoder* m_pDecoder;
+	MultiBlock* m_pCurrBlock;
 
-	bool posPrimaryIndex;
-	bool isROS;
-	bool valSorted;
-	bool posFilterChanged;
-	bool predChanged;
-	bool firstCall;
+	bool m_bPosPrimaryIndex;
+	bool m_bIsROS;
+	bool m_bValSorted;
+	bool m_bPosFilterChanged;
+	bool m_bPredChanged;
+	bool m_bFirstCall;
 
 	// Filter streams
-	MultiPosFilterBlock* posFilter;
-	MultiPosFilterBlock* matchedPredPos;
-	RLETriple* posOutTripleOnPred;
-	MultiPosFilterCursor* filterCursor;
+	MultiPosFilterBlock* m_pPosFilter;
+	MultiPosFilterBlock* m_pMatchedPredPos;
+	RLETriple* m_pPosOutTripleOnPred;
+	MultiPosFilterCursor* m_pFilterCursor;
 
 	// Main method to get a page given the predicates and filters
 	virtual byte* getRightPage();

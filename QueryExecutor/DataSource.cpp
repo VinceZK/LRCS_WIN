@@ -9,105 +9,105 @@ DataSource::DataSource(AM* am_, bool isROS_) {
 
 DataSource::DataSource(AM* am_, bool isROS_, bool valSorted_, Decoder* decoder_) {
 	init(am_, isROS_);
-	valSorted = valSorted_;
-	decoder = decoder_;
-	currBlock = NULL;
+	m_bValSorted = valSorted_;
+	m_pDecoder = decoder_;
+	m_pCurrBlock = NULL;
 
 }
 
 void DataSource::init(AM* am_, bool isROS_) {
 	if (am_ == NULL)
 		throw new UnexpectedException("DataSource::constructor Error, am is NULL");
-	am = am_;
+	m_pAM = am_;
 
 	if (!isROS_)
-		posPrimaryIndex = false;
+		m_bPosPrimaryIndex = false;
 	else {
-		posPrimaryIndex = true;
+		m_bPosPrimaryIndex = true;
 	}
-	isROS = isROS_;
+	m_bIsROS = isROS_;
 
-	am->initCursors();
-	posFilterChanged = true;
-	predChanged = true;
-	pred = NULL;
+	m_pAM->initCursors();
+	m_bPosFilterChanged = true;
+	m_bPredChanged = true;
+	m_pPred = NULL;
 
-	posFilter = NULL;
-	filterCursor = NULL;
-	matchedPredPos = NULL;
-	posOutTripleOnPred = new RLETriple();
-	firstCall = true;
+	m_pPosFilter = NULL;
+	m_pFilterCursor = NULL;
+	m_pMatchedPredPos = NULL;
+	m_pPosOutTripleOnPred = new RLETriple();
+	m_bFirstCall = true;
 }
 
 DataSource::~DataSource() {
-	if (posOutTripleOnPred){
-		delete posOutTripleOnPred;
-		posOutTripleOnPred = NULL;
+	if (m_pPosOutTripleOnPred){
+		delete m_pPosOutTripleOnPred;
+		m_pPosOutTripleOnPred = NULL;
 	}
-	if (matchedPredPos){
-		delete matchedPredPos;
-		matchedPredPos = NULL;
+	if (m_pMatchedPredPos){
+		delete m_pMatchedPredPos;
+		m_pMatchedPredPos = NULL;
 	}
-	if (filterCursor){
-		delete filterCursor;
-		filterCursor = NULL;
+	if (m_pFilterCursor){
+		delete m_pFilterCursor;
+		m_pFilterCursor = NULL;
 	}
 }
 
 // Changes the RHS binding for this datasource
 void DataSource::changeRHSBinding(ValPos* rhs_) {
-	if (pred == NULL)
+	if (m_pPred == NULL)
 		throw new UnexpectedException("DataSource: Error, setting binding on NULL predicate");
 	else {
-		pred->setRHS(rhs_);
-		predChanged = true;
+		m_pPred->setRHS(rhs_);
+		m_bPredChanged = true;
 	}
 }
 
 // sets a new predicate for this datasource
 void DataSource::setPredicate(Predicate* pred_) {
-	predChanged = true;
-	pred = pred_;
+	m_bPredChanged = true;
+	m_pPred = pred_;
 }
 
 // Sets a filter for postions
 void DataSource::setPositionFilter(MultiPosFilterBlock* bitstringDataSource_) {
-	posFilterChanged = true;
-	posFilter = bitstringDataSource_;
+	m_bPredChanged = true;
+	m_pPosFilter = bitstringDataSource_;
 }
 
 
 //getLastPosition returns the last position in the data source (column)
 int DataSource::getLastPosition() {
-	if (posPrimaryIndex)
-		return *(int*)am->getLastIndexValuePrimary();
+	if (m_bPosPrimaryIndex)
+		return *(int*)m_pAM->getLastIndexValuePrimary();
 	else
 		return 1; //To be implemented
 }
 
 const void* DataSource::getNextPageValue() {
-	if (posPrimaryIndex)
-		return am->getNextPagePrimary();
+	if (m_bPosPrimaryIndex)
+		return m_pAM->getNextPagePrimary();
 	else
 		return NULL;//To be implemented
 }
 
 const void* DataSource::skipToPageValue(char* key) {
-	if (posPrimaryIndex)
-		return am->skipToPageSecondary(key);
+	if (m_bPosPrimaryIndex)
+		return m_pAM->skipToPageSecondary(key);
 	else
-		return am->skipToPagePrimary(key);
+		return m_pAM->skipToPagePrimary(key);
 }
 
 const void* DataSource::skipToPagePosition(int key) {
-	if (posPrimaryIndex)
-		return am->skipToPagePrimary((char*)&key);
+	if (m_bPosPrimaryIndex)
+		return m_pAM->skipToPagePrimary((char*)&key);
 	else
 		return NULL;//To be implemented
 }
 
 Block* DataSource::getDecodedBlock() {
-	return decoder->getNextBlock();
+	return m_pDecoder->getNextBlock();
 }
 
 Block* DataSource::getDecodedBlock(Decoder* decoder_) {
@@ -120,34 +120,34 @@ Block* DataSource::getNextValBlock(int colIndex_) {
 
 	byte* page = getRightPage();
 	if (page == NULL) return NULL;
-	decoder->setBuffer(page);
-	if (posFilter != NULL){
-		unsigned int currStartPos = filterCursor->getCurrStartPosition();
+	m_pDecoder->setBuffer(page);
+	if (m_pPosFilter != NULL){
+		unsigned int currStartPos = m_pFilterCursor->getCurrStartPosition();
 		skipToRightPosOnPage(currStartPos);
-		currBlock = (MultiBlock*)getDecodedBlock();
-		if (currBlock == NULL) return NULL;
-		currBlock->filterWithPos(filterCursor);
+		m_pCurrBlock = (MultiBlock*)getDecodedBlock();
+		if (m_pCurrBlock == NULL) return NULL;
+		m_pCurrBlock->filterWithPos(m_pFilterCursor);
 	}
 	else{
-		currBlock = (MultiBlock*)getDecodedBlock();
+		m_pCurrBlock = (MultiBlock*)getDecodedBlock();
 	}
 
-	return currBlock;
+	return m_pCurrBlock;
 }
 
 byte* DataSource::getRightPage() {
 	Log::writeToLog("DataSource", 0, "Called GetRightPage()");
 	// if anything has changed we need to reset the indices
-	if (posFilterChanged || predChanged) {
+	if (m_bPosFilterChanged || m_bPredChanged) {
 		Log::writeToLog("Datasource", 0, "Filter or pred changed, initing cursors");
-		am->initCursors();
+		m_pAM->initCursors();
 	}
 
-	if (posFilter != NULL){
-		if (posFilter->isCompleteSet()){
+	if (m_pPosFilter != NULL){
+		if (m_pPosFilter->isCompleteSet()){
 			return getPage();//Sequential Reading
 		}
-		else if (posFilter->isNullSet())
+		else if (m_pPosFilter->isNullSet())
 			return NULL;
 		else
 			return getPageOnPos();
@@ -161,22 +161,22 @@ byte* DataSource::getPage() {
 }
 
 byte* DataSource::getPageOnPos() {
-	if (filterCursor == NULL){
-		filterCursor = posFilter->getCursor();
-		filterCursor->getNext();//Move to the start position
-		filterCursor->setCurrStartPosition(); //Record current start position
+	if (m_pFilterCursor == NULL){
+		m_pFilterCursor = m_pPosFilter->getCursor();
+		m_pFilterCursor->getNext();//Move to the start position
+		m_pFilterCursor->setCurrStartPosition(); //Record current start position
 	}
 
-	if (!filterCursor->isFilterFinished()){
-		am->initCursors();
-		return (byte*)skipToPagePosition(filterCursor->getCurrStartPosition());
+	if (!m_pFilterCursor->isFilterFinished()){
+		m_pAM->initCursors();
+		return (byte*)skipToPagePosition(m_pFilterCursor->getCurrStartPosition());
 	}
 	else return NULL;
 }
 
 // Finds the right block on the page
 bool DataSource::skipToRightPosOnPage(unsigned int pos_) {
-	if (decoder->skipToPos(pos_))
+	if (m_pDecoder->skipToPos(pos_))
 		return true;
 	else
 		return false;
@@ -189,22 +189,22 @@ MultiPosFilterBlock* DataSource::getPosOnPred(){
 	* For the reason of different value types.
 	* The default here is string.
 	*/
-	matchedPredPos = new MultiPosFilterBlock();
-	if (pred == NULL)matchedPredPos->setCompleteSet(true);
+	m_pMatchedPredPos = new MultiPosFilterBlock();
+	if (m_pPred == NULL)m_pMatchedPredPos->setCompleteSet(true);
 	else{
-		predChanged = false;//Reset predChanged
+		m_bPredChanged = false;//Reset predChanged
 
-		ValPos* rhsvp = pred->getRHS();
+		ValPos* rhsvp = m_pPred->getRHS();
 		char* rhsval = (char*)rhsvp->value;
 		ValPos* tempVP = rhsvp->clone();
-		int valsize = pred->getRHS()->getSize();
+		int valsize = m_pPred->getRHS()->getSize();
 #ifdef DEBUG
 		char* pTmp = new char[valsize+1];
 		memset(pTmp,  0, sizeof(char)*(valsize+1));
 		strncpy(pTmp, rhsval, valsize);
 #endif
 		unsigned char* temp;
-		if (pred->getRHS()->type == ValPos::STRINGTYPE){
+		if (m_pPred->getRHS()->type == ValPos::STRINGTYPE){
 			temp = StringUtil::getSmallestLargerValue(rhsval, valsize);
 			tempVP->set(temp);
 		}
@@ -212,19 +212,19 @@ MultiPosFilterBlock* DataSource::getPosOnPred(){
 			return NULL;
 		}
 
-		if (valSorted) {
+		if (m_bValSorted) {
 			getPosOnPredValueSorted(rhsvp, tempVP);
 		}
 		else {// The column is not value sorted
-			getPosOnPredValueUnsorted((ROSAM*)am, rhsvp, tempVP);
+			getPosOnPredValueUnsorted((ROSAM*)m_pAM, rhsvp, tempVP);
 		}
 	}
-	return matchedPredPos;
+	return m_pMatchedPredPos;
 }
 //Get postion on predition if the value is sorted:Check
 bool DataSource::getPosOnPredValueSorted(ValPos* rhsvp_, ValPos* tempVP_){
 
-	if (!posOutTripleOnPred->isNull()) return false;
+	if (!m_pPosOutTripleOnPred->isNull()) return false;
 	byte* page = NULL;
 	unsigned int position = 0;
 	unsigned int minPos = 1;
@@ -234,85 +234,85 @@ bool DataSource::getPosOnPredValueSorted(ValPos* rhsvp_, ValPos* tempVP_){
 	char* rhsval = (char*)rhsvp_->value;
 	char* temp = (char*)tempVP_->value;
 
-	switch (pred->getPredType()) {
+	switch (m_pPred->getPredType()) {
 	case Predicate::OP_GREATER_THAN:
 		page = (byte*)skipToPageValue(temp);
 		if (page != NULL) {
-			decoder->setBuffer(page);
-			if (decoder->skipToBlockOnValue(tempVP_))
-				position = ((MultiBlock*)getDecodedBlock(decoder))->getPosition();
+			m_pDecoder->setBuffer(page);
+			if (m_pDecoder->skipToBlockOnValue(tempVP_))
+				position = ((MultiBlock*)getDecodedBlock(m_pDecoder))->getPosition();
 		}
 		else return false;
-		if (position == 0) posOutTripleOnPred->setTriple(NULL, minPos, maxPos - minPos + 1);
+		if (position == 0) m_pPosOutTripleOnPred->setTriple(NULL, minPos, maxPos - minPos + 1);
 		if (position == maxPos)return false;
 		else
-			posOutTripleOnPred->setTriple(NULL, position, maxPos - position + 1);
+			m_pPosOutTripleOnPred->setTriple(NULL, position, maxPos - position + 1);
 		break;
 	case Predicate::OP_GREATER_THAN_OR_EQUAL:
 		page = (byte*)skipToPageValue(rhsval);
 		if (page != NULL) {
-			decoder->setBuffer(page);
-			if (decoder->skipToBlockOnValue(rhsvp_))
-				position = ((MultiBlock*)getDecodedBlock(decoder))->getPosition();
+			m_pDecoder->setBuffer(page);
+			if (m_pDecoder->skipToBlockOnValue(rhsvp_))
+				position = ((MultiBlock*)getDecodedBlock(m_pDecoder))->getPosition();
 		}
-		if (position == 0) matchedPredPos->setCompleteSet(true);
+		if (position == 0) m_pMatchedPredPos->setCompleteSet(true);
 		if (position == maxPos)return false;
-		else posOutTripleOnPred->setTriple(NULL, position, maxPos - position + 1);
+		else m_pPosOutTripleOnPred->setTriple(NULL, position, maxPos - position + 1);
 		break;
 	case Predicate::OP_EQUAL:
 		page = (byte*)skipToPageValue(rhsval);
 		if (page != NULL) {
-			decoder->setBuffer(page);
-			if (decoder->skipToBlockOnValue(rhsvp_))
-				position = ((MultiBlock*)getDecodedBlock(decoder))->getPosition();
+			m_pDecoder->setBuffer(page);
+			if (m_pDecoder->skipToBlockOnValue(rhsvp_))
+				position = ((MultiBlock*)getDecodedBlock(m_pDecoder))->getPosition();
 		}
 		if (position == 0)return false;
 		unsigned int end;
 		page = (byte*)skipToPageValue(temp);
 		if (page != NULL) {
-			decoder->setBuffer(page);
-			if (decoder->skipToBlockOnValue(tempVP_))
-				end = ((MultiBlock*)getDecodedBlock(decoder))->getPosition() - 1;
+			m_pDecoder->setBuffer(page);
+			if (m_pDecoder->skipToBlockOnValue(tempVP_))
+				end = ((MultiBlock*)getDecodedBlock(m_pDecoder))->getPosition() - 1;
 		}
 		else end = 0;
 
 		if (end == 0){
-			if (position == 1)matchedPredPos->setCompleteSet(true);
-			else posOutTripleOnPred->setTriple(NULL, position, maxPos - position + 1);
+			if (position == 1)m_pMatchedPredPos->setCompleteSet(true);
+			else m_pPosOutTripleOnPred->setTriple(NULL, position, maxPos - position + 1);
 		}
-		else posOutTripleOnPred->setTriple(NULL, position, end - position + 1);
+		else m_pPosOutTripleOnPred->setTriple(NULL, position, end - position + 1);
 		break;
 	case Predicate::OP_LESS_THAN:
 		//if (position==minPos) return false;
 		page = (byte*)skipToPageValue(rhsval);
 		if (page != NULL) {
-			decoder->setBuffer(page);
-			if (decoder->skipToBlockOnValue(rhsvp_))
-				position = ((MultiBlock*)getDecodedBlock(decoder))->getPosition();
+			m_pDecoder->setBuffer(page);
+			if (m_pDecoder->skipToBlockOnValue(rhsvp_))
+				position = ((MultiBlock*)getDecodedBlock(m_pDecoder))->getPosition();
 		}
-		else matchedPredPos->setCompleteSet(true);
-		if (position >= 1 && !matchedPredPos->isCompleteSet())
-			posOutTripleOnPred->setTriple(NULL, minPos, position - minPos + 1);
+		else m_pMatchedPredPos->setCompleteSet(true);
+		if (position >= 1 && !m_pMatchedPredPos->isCompleteSet())
+			m_pPosOutTripleOnPred->setTriple(NULL, minPos, position - minPos + 1);
 		break;
 	case Predicate::OP_LESS_THAN_OR_EQUAL:
 		//if (position==minPos)return false;
 		page = (byte*)skipToPageValue(temp);
 		if (page != NULL) {
-			decoder->setBuffer(page);
-			if (decoder->skipToBlockOnValue(tempVP_))
-				position = ((MultiBlock*)getDecodedBlock(decoder))->getPosition();
+			m_pDecoder->setBuffer(page);
+			if (m_pDecoder->skipToBlockOnValue(tempVP_))
+				position = ((MultiBlock*)getDecodedBlock(m_pDecoder))->getPosition();
 		}
-		else matchedPredPos->setCompleteSet(true);
-		if (position >= 1 && !matchedPredPos->isCompleteSet())
-			posOutTripleOnPred->setTriple(NULL, minPos, position - minPos + 1);
+		else m_pMatchedPredPos->setCompleteSet(true);
+		if (position >= 1 && !m_pMatchedPredPos->isCompleteSet())
+			m_pPosOutTripleOnPred->setTriple(NULL, minPos, position - minPos + 1);
 		break;
 	default:
 		return false;
 		break;
 	}
 
-	if (!matchedPredPos->isCompleteSet())
-		matchedPredPos->setTriple(posOutTripleOnPred);
+	if (!m_pMatchedPredPos->isCompleteSet())
+		m_pMatchedPredPos->setTriple(m_pPosOutTripleOnPred);
 	return true;
 }
 
@@ -329,15 +329,15 @@ bool DataSource::getPosOnPredValueUnsorted(ROSAM* am_, ValPos* rhsvp_, ValPos* t
 
 	while (!done){
 		//01. get a page from BDB
-		switch (pred->getPredType()) {
+		switch (m_pPred->getPredType()) {
 		case Predicate::OP_GREATER_THAN:
-			if (firstCall)
+			if (m_bFirstCall)
 				page = (byte*)am_->getDbSetRange(temp);
 			else
 				page = (byte*)am_->getDbNext();
 			break;
 		case Predicate::OP_GREATER_THAN_OR_EQUAL:
-			if (firstCall)
+			if (m_bFirstCall)
 				page = (byte*)am_->getDbSetRange(rhsval);
 			else
 				page = (byte*)am_->getDbNext();
@@ -347,10 +347,10 @@ bool DataSource::getPosOnPredValueUnsorted(ROSAM* am_, ValPos* rhsvp_, ValPos* t
 			done = true;
 			break;
 		case Predicate::OP_LESS_THAN:
-			page = (byte*)am_->getDbNextRange(rhsval, firstCall);
+			page = (byte*)am_->getDbNextRange(rhsval, m_bFirstCall);
 			break;
 		case Predicate::OP_LESS_THAN_OR_EQUAL:
-			page = (byte*)am_->getDbNextRange(temp, firstCall);
+			page = (byte*)am_->getDbNextRange(temp, m_bFirstCall);
 			break;
 		default:
 			break;
@@ -376,14 +376,14 @@ bool DataSource::getPosOnPredValueUnsorted(ROSAM* am_, ValPos* rhsvp_, ValPos* t
 		//05. get the pairs one by one
 		while (currBlockPos->hasNext()){
 			pair = currBlockPos->getNext();
-			matchedPredPos->addPosition(*(int*)pair->value);
+			m_pMatchedPredPos->addPosition(*(int*)pair->value);
 		}
-		firstCall = false;
+		m_bFirstCall = false;
 	}
 
 	delete posdecoder;
 
 	//06. Check whether matchedPredPos is empty or not
-	if (matchedPredPos->isNullSet())return false;
+	if (m_pMatchedPredPos->isNullSet())return false;
 	else return true;
 }

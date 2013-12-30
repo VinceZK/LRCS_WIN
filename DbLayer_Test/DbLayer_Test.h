@@ -32,8 +32,8 @@ public:
 	std::vector<tstring> GetFirstData();
 	std::vector<tstring> GetNextData();
 
-private:
-	tstring ToTString(char* psz, int nLen);
+//private:
+//	tstring ToTString(char* psz, int nLen);
 private:
 	bool m_bInit;
 	tstring	m_strDbFile;

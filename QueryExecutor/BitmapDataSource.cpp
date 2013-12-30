@@ -7,8 +7,8 @@
 BitmapDataSource::BitmapDataSource(AM* am_, bool valSorted_, bool isROS, Decoder* decoder_)
 : DataSource(am_, isROS)
 {
-	valSorted = valSorted_;
-	decoder = new LZDecoder(decoder_);
+	m_bValSorted = valSorted_;
+	m_pDecoder = new LZDecoder(decoder_);
 	//decoder = new StringDecoder(true);
 }
 
@@ -16,32 +16,32 @@ BitmapDataSource::BitmapDataSource(AM* am_, bool valSorted_, bool isROS, Decoder
 BitmapDataSource::~BitmapDataSource()
 {
 
-	if (decoder != NULL) delete decoder;
+	if (m_pDecoder != NULL) delete m_pDecoder;
 	//if (currBlock!=NULL) delete currBlock;
 }
 
 //Get the position block on predicaiton
 MultiPosFilterBlock* BitmapDataSource::getPosOnPred(){
-	if (pred == NULL){
-		matchedPredPos = new MultiPosFilterBlock();
-		matchedPredPos->setCompleteSet(true);
+	if (m_pPred == NULL){
+		m_pMatchedPredPos = new MultiPosFilterBlock();
+		m_pMatchedPredPos->setCompleteSet(true);
 	}
 	else{
-		predChanged = false;//Reset predChanged
+		m_bPredChanged = false;//Reset predChanged
 
-		ValPos* rhsvp = pred->getRHS();
+		ValPos* rhsvp = m_pPred->getRHS();
 		char* rhsval = (char*)rhsvp->value;
 		ValPos* tempVP = rhsvp->clone();
-		int valsize = pred->getRHS()->getSize();
+		int valsize = m_pPred->getRHS()->getSize();
 		unsigned char* temp;
 		temp = StringUtil::getSmallestLargerValue(rhsval, valsize);
 		tempVP->set(temp);
 		// The column is for sure not value sorted
-		if (!getPosOnPredValueUnsorted((ROSAM*)am, rhsvp, tempVP))
+		if (!getPosOnPredValueUnsorted((ROSAM*)m_pAM, rhsvp, tempVP))
 			//If nothing find, matched predication position is a NULL set.
-			matchedPredPos = new MultiPosFilterBlock();
+			m_pMatchedPredPos = new MultiPosFilterBlock();
 	}
-	return matchedPredPos;
+	return m_pMatchedPredPos;
 }
 
 //Get position on predition if the value is unsorted:check
@@ -59,30 +59,30 @@ bool BitmapDataSource::getPosOnPredValueUnsorted(ROSAM* am_, ValPos* rhsvp_, Val
 
 	while (!done){
 		//01. get a page from BDB
-		switch (pred->getPredType()) {
+		switch (m_pPred->getPredType()) {
 		case Predicate::OP_GREATER_THAN:
-			if (firstCall)
+			if (m_bFirstCall)
 				page = (byte*)am_->getDbPageRange(temp);
 			else
 				page = (byte*)am_->getDbPageNext();
 			break;
 		case Predicate::OP_GREATER_THAN_OR_EQUAL:
-			if (firstCall)
+			if (m_bFirstCall)
 				page = (byte*)am_->getDbPageRange(rhsval);
 			else
 				page = (byte*)am_->getDbPageNext();
 			break;
 		case Predicate::OP_EQUAL:
-			if (firstCall)
+			if (m_bFirstCall)
 				page = (byte*)am_->getDbPageSet(rhsval);
 			else
 				page = (byte*)am_->getDbPageNextDup();
 			break;
 		case Predicate::OP_LESS_THAN:
-			page = (byte*)am_->getDbPageNextRange(rhsval, firstCall);
+			page = (byte*)am_->getDbPageNextRange(rhsval, m_bFirstCall);
 			break;
 		case Predicate::OP_LESS_THAN_OR_EQUAL:
-			page = (byte*)am_->getDbPageNextRange(temp, firstCall);
+			page = (byte*)am_->getDbPageNextRange(temp, m_bFirstCall);
 			break;
 		default:
 			break;
@@ -94,7 +94,7 @@ bool BitmapDataSource::getPosOnPredValueUnsorted(ROSAM* am_, ValPos* rhsvp_, Val
 		}
 
 		//02. Add OR operator
-		if (!firstCall)posOperator->addWhereOp('|');
+		if (!m_bFirstCall)posOperator->addWhereOp('|');
 
 		//03. Decode the page
 		bitmapDecoder->setBuffer(page);
@@ -108,21 +108,21 @@ bool BitmapDataSource::getPosOnPredValueUnsorted(ROSAM* am_, ValPos* rhsvp_, Val
 		}
 
 		posOperator->addPosBlock(multiPosBlock);
-		firstCall = false;
+		m_bFirstCall = false;
 	}
 	posOperator->finishWhereOp();
-	matchedPredPos = posOperator->getPosFilter();
+	m_pMatchedPredPos = posOperator->getPosFilter();
 	//cout<<matchedPredPos->getNumValuesR()<<endl;
 	delete bitmapDecoder;
 	delete posOperator;
 
-	if (matchedPredPos == NULL)return false;
+	if (m_pMatchedPredPos == NULL)return false;
 	else return true;
 }
 
 // Finds the right block on the page
 bool BitmapDataSource::skipToRightPosOnPage(unsigned int pos_) {
-	if (decoder->skipToPos(pos_))
+	if (m_pDecoder->skipToPos(pos_))
 		return true;
 	else
 		return false;

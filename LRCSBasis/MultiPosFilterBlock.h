@@ -13,6 +13,8 @@
 #include "RLEBlock.h"
 using namespace std;
 
+#pragma warning (disable:4251)
+
 class MultiPosFilterCursor;
 
 class LRCSBasis_API MultiPosFilterBlock
