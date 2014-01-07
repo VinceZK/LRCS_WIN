@@ -4,6 +4,10 @@
 #include "AtlConv.h"
 #include <memory>
 
+#include "../LRCSBasis/LZDecoder.h"
+#include "../LRCSBasis/StringDecoder.h"
+#include "../LRCSBasis/Block.h"
+
 DataDecoder::DataDecoder(void)
 {
 }
@@ -23,7 +27,7 @@ tstring DataDecoder::ToString(BYTE* byData, int nDataLen, DataEncodeType dt)
 	case eDTInt:
 	{
 		TCHAR pBuf[1024];
-		memset(pBuf, 0, 1024);
+		memset(pBuf, 0, 1024 * sizeof(TCHAR));
 		_stprintf_s(pBuf, 1024, _T("%d"), *((int*)byData));
 		result = pBuf;
 		break;
@@ -37,10 +41,54 @@ tstring DataDecoder::ToString(BYTE* byData, int nDataLen, DataEncodeType dt)
 		break;
 	}
 	case eDTLZ:
+	{
+		TCHAR pBuf[1024];
+		memset(pBuf, 0, 1024 * sizeof(TCHAR));
+		std::shared_ptr<Decoder> pStringDecoder(new StringDecoder(true));
+		std::shared_ptr<Decoder> pDecoder(new LZDecoder(pStringDecoder.get()));
+		pDecoder->setBuffer(byData);
+
+		Block* pBlock = pDecoder->getNextBlock();
+		ValPos* pVal = pBlock->getNext();
+
+		while (pVal != NULL)
+		{
+			switch (pVal->type)
+			{
+			case ValPos::INTTYPE:
+			case ValPos::LONGTYPE:
+				_stprintf_s(pBuf, 1024, _T("%d"), *((int*)pVal->value));
+				break;
+			case ValPos::FLOATTYPE:
+				_stprintf_s(pBuf, 1024, _T("%f"), *((float*)pVal->value));
+				break;
+			case ValPos::STRINGTYPE:
+			{
+				char szBuf[1024];
+				strncpy_s(szBuf, pVal->getSize() + 1, (char*)pVal->value, pVal->getSize());
+				_tcscpy_s(pBuf, 1024, CA2T(szBuf));
+				break;
+			}
+			case ValPos::DOUBLETYPE:
+				_stprintf_s(pBuf, 1024, _T("%f"), *((double*)pVal->value));
+				break;
+			default:
+				//NOTYPE
+				break;
+			}		
+
+			result += pBuf;
+			pVal = pBlock->getNext();
+		}
+
 		break;
+	}
 	case eDTBitmap:
-		break;
+		//break;
 	case eDTRLE:
+		//break;
+	default:
+		_ASSERT(_T("Unsupported decoder type!"));
 		break;
 	}
 

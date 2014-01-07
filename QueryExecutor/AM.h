@@ -8,7 +8,13 @@
 #include "Util.h"
 using namespace std;
 
-class __declspec(dllexport) AM
+#ifdef QUERYEXECUTOR_EXPORTS
+#define QueryExecutor_API	__declspec(dllexport)
+#else
+#define QueryExecutor_API	__declspec(dllimport)
+#endif
+
+class QueryExecutor_API AM
 {
 public:
 	AM();

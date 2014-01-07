@@ -13,6 +13,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include "DataDecoder.h"
 
 class Db;
 class Dbc;
@@ -32,16 +33,20 @@ public:
 	std::vector<tstring> GetFirstData();
 	std::vector<tstring> GetNextData();
 
-//private:
-//	tstring ToTString(char* psz, int nLen);
+	void SetDecoder(DataDecoder::DataEncodeType deType){
+		m_dataType = deType;
+	}
+
 private:
 	bool m_bInit;
 	tstring	m_strDbFile;
 
 	std::shared_ptr<Db>	m_spDb;
 	Dbc*	m_pCursor;
+
+	DataDecoder::DataEncodeType	m_dataType;
 };
 
-extern DBLAYER_TEST_API int nDbLayer_Test;
-
-DBLAYER_TEST_API int fnDbLayer_Test(void);
+//extern DBLAYER_TEST_API int nDbLayer_Test;
+//
+//DBLAYER_TEST_API int fnDbLayer_Test(void);

@@ -1,7 +1,7 @@
 #pragma once
 #include "DataSource.h"
 
-class __declspec(dllexport) BitmapDataSource :
+class QueryExecutor_API BitmapDataSource :
 	public DataSource
 {
 public:

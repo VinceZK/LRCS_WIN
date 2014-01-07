@@ -11,18 +11,19 @@
 #include "DataDecoder.h"
 
 // This is an example of an exported variable
-DBLAYER_TEST_API int nDbLayer_Test=0;
-
-// This is an example of an exported function.
-DBLAYER_TEST_API int fnDbLayer_Test(void)
-{
-	return 42;
-}
+//DBLAYER_TEST_API int nDbLayer_Test=0;
+//
+//// This is an example of an exported function.
+//DBLAYER_TEST_API int fnDbLayer_Test(void)
+//{
+//	return 42;
+//}
 
 // This is the constructor of a class that has been exported.
 // see DbLayer_Test.h for the class definition
 CDbLayer_Test::CDbLayer_Test()
-	: m_bInit(false)
+	: m_bInit(false),
+	m_dataType(DataDecoder::eDTString)
 {	
 }
 
@@ -83,32 +84,13 @@ std::vector<tstring> CDbLayer_Test::GetFirstData()
 		memset(&data, 0, sizeof(Dbt));
 		if(0 == m_pCursor->get(&key, &data, DB_FIRST))
 		{
-			result.push_back(_T("key:") + DataDecoder().ToString((BYTE*)key.get_data(), key.get_size(), DataDecoder::eDTString));
-			result.push_back(_T("value:") + DataDecoder().ToString((BYTE*)data.get_data(), data.get_size(), data.get_size() == 4 ? DataDecoder::eDTInt : DataDecoder::eDTString));
+			result.push_back(_T("key:") + DataDecoder().ToString((BYTE*)key.get_data(), key.get_size(), m_dataType));
+			result.push_back(_T("value:") + DataDecoder().ToString((BYTE*)data.get_data(), data.get_size(), data.get_size() == 4 ? DataDecoder::eDTInt : m_dataType));
 		}
 	}
 
 	return result;
 }
-//
-//tstring CDbLayer_Test::ToTString(char* psz, int nLen)
-//{
-//	USES_CONVERSION;
-//	if (nLen == 4)
-//	{
-//		TCHAR pBuf[1024];
-//		memset(pBuf, 0, 1024);
-//		_stprintf_s(pBuf, 1024, _T("%d"), *((int*)psz));
-//		return tstring(pBuf);
-//	}
-//	else
-//	{
-//		char* pBuf = new char[nLen+1];
-//		memset(pBuf, 0, nLen+1);
-//		strncpy_s(pBuf, nLen+1, psz, nLen);
-//		return tstring(A2CT(pBuf));
-//	}
-//}
 
 std::vector<tstring> CDbLayer_Test::GetNextData()
 {
@@ -118,8 +100,8 @@ std::vector<tstring> CDbLayer_Test::GetNextData()
 	memset(&data, 0, sizeof(Dbt));
 	if (0 == m_pCursor->get(&key, &data, DB_NEXT))
 	{
-		result.push_back(_T("key:") + DataDecoder().ToString((BYTE*)key.get_data(), key.get_size(), DataDecoder::eDTString));
-		result.push_back(_T("value:") + DataDecoder().ToString((BYTE*)data.get_data(), data.get_size(), data.get_size() == 4 ? DataDecoder::eDTInt : DataDecoder::eDTString));
+		result.push_back(_T("key:") + DataDecoder().ToString((BYTE*)key.get_data(), key.get_size(), m_dataType));
+		result.push_back(_T("value:") + DataDecoder().ToString((BYTE*)data.get_data(), data.get_size(), data.get_size() == 4 ? DataDecoder::eDTInt : m_dataType));
 	}
 
 	return result;

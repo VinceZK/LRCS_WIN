@@ -27,4 +27,6 @@ private:
 	std::shared_ptr<CDbLayer_Test> m_spDb;
 public:
 	afx_msg void OnBnClickedButton1();
+	virtual BOOL OnInitDialog();
+	afx_msg void OnCbnSelchangeDataType();
 };

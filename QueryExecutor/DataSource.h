@@ -13,7 +13,13 @@
 //	-Holds data in memory
 // 	-Provides filtering of a column on a bitstring
 
-class __declspec(dllexport) DataSource : public Operator
+#ifdef QUERYEXECUTOR_EXPORTS
+#define QueryExecutor_API	__declspec(dllexport)
+#else
+#define QueryExecutor_API	__declspec(dllimport)
+#endif
+
+class QueryExecutor_API DataSource : public Operator
 {
 public:
 	// Construct a datasource that :

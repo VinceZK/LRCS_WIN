@@ -1,7 +1,7 @@
 #pragma once
 #include "DataSource.h"
 
-class __declspec(dllexport) StringDataSource :
+class QueryExecutor_API StringDataSource :
 	public DataSource
 {
 public:

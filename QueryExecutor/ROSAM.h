@@ -13,9 +13,14 @@
 /**
 * Access BDB columns
 */
+#ifdef QUERYEXECUTOR_EXPORTS
+#define QueryExecutor_API	__declspec(dllexport)
+#else
+#define QueryExecutor_API	__declspec(dllimport)
+#endif
 
 using namespace std;
-class __declspec(dllexport) ROSAM :
+class QueryExecutor_API ROSAM :
 	public AM
 {
 public:

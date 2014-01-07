@@ -1,7 +1,7 @@
 #pragma once
 #include "DataSource.h"
 
-class __declspec(dllexport) LZDataSource :
+class QueryExecutor_API LZDataSource :
 	public DataSource
 {
 public:

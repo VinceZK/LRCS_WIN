@@ -32,6 +32,7 @@ void CBerkeleyView::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CBerkeleyView, CDialogEx)
 	ON_BN_CLICKED(IDC_DB_FILE_BROWSE, &CBerkeleyView::OnBnClickedDbFileBrowse)
 	ON_BN_CLICKED(IDC_BUTTON1, &CBerkeleyView::OnBnClickedButton1)
+	ON_CBN_SELCHANGE(IDC_DATA_TYPE, &CBerkeleyView::OnCbnSelchangeDataType)
 END_MESSAGE_MAP()
 
 
@@ -64,6 +65,9 @@ void CBerkeleyView::OnBnClickedButton1()
 
 		m_spDb.reset(new CDbLayer_Test());
 		m_spDb->InitDb(csDbFile);
+
+		CComboBox* pBox = (CComboBox*)GetDlgItem(IDC_DATA_TYPE);
+		m_spDb->SetDecoder((DataDecoder::DataEncodeType)pBox->GetItemData(pBox->GetCurSel()));
 
 		CListBox* pList = (CListBox*)GetDlgItem(IDC_LIST_DB_CONTENT);
 		pList->ResetContent();
@@ -99,4 +103,31 @@ void CBerkeleyView::OnBnClickedButton1()
 			++nLine;
 		}
 	}
+}
+
+
+BOOL CBerkeleyView::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	// TODO:  Add extra initialization here
+	CComboBox* pBox = (CComboBox*)GetDlgItem(IDC_DATA_TYPE);
+	pBox->AddString(_T("String"));
+	pBox->SetItemData(0, DataDecoder::eDTString);
+	pBox->AddString(_T("Bitmap"));
+	pBox->SetItemData(0, DataDecoder::eDTBitmap);
+	pBox->AddString(_T("LZ"));
+	pBox->SetItemData(0, DataDecoder::eDTLZ);
+	pBox->AddString(_T("RLE"));
+	pBox->SetItemData(0, DataDecoder::eDTRLE);
+
+	pBox->SelectString(0, _T("String"));
+	return TRUE;  // return TRUE unless you set the focus to a control
+	// EXCEPTION: OCX Property Pages should return FALSE
+}
+
+
+void CBerkeleyView::OnCbnSelchangeDataType()
+{
+	// TODO: Add your control notification handler code here
 }

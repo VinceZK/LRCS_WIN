@@ -8,7 +8,14 @@
 #include "DataSource.h"
 #include "PosOperator.h"
 
-class __declspec(dllexport) BlockPrinter
+#ifdef QUERYEXECUTOR_EXPORTS
+#define QueryExecutor_API	__declspec(dllexport)
+#else
+#define QueryExecutor_API	__declspec(dllimport)
+#endif
+
+
+class QueryExecutor_API BlockPrinter
 {
 public:
 	BlockPrinter(DataSource* dataSrc_[], int numCols_[], int numSrcs_, char* fileName_);

@@ -45,12 +45,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\LZO;..\BDB;..\LRCSBasis;$(IncludePath)</IncludePath>
+    <IncludePath>..\include;..\LZO;..\BDB;..\LRCSBasis;$(IncludePath)</IncludePath>
     <LibraryPath>..\LZO;..\BDB;$(OutDir);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>..\LZO;..\BDB;..\LRCSBasis;$(IncludePath)</IncludePath>
+    <IncludePath>..\include;..\LZO;..\BDB;..\LRCSBasis;$(IncludePath)</IncludePath>
     <LibraryPath>..\LZO;..\BDB;$(OutDir);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -63,7 +63,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libdb42d.lib;LRCSBasis.lib;LRCSWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\Libs\gtestd.lib;libdb42d.lib;LRCSBasis.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
@@ -81,7 +81,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libdb42.lib;LRCSBasis.lib;LRCSWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\Libs\gtest.lib;libdb42.lib;LRCSBasis.lib;LRCSWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
