@@ -10,17 +10,6 @@
 
 #include "DataDecoder.h"
 
-// This is an example of an exported variable
-//DBLAYER_TEST_API int nDbLayer_Test=0;
-//
-//// This is an example of an exported function.
-//DBLAYER_TEST_API int fnDbLayer_Test(void)
-//{
-//	return 42;
-//}
-
-// This is the constructor of a class that has been exported.
-// see DbLayer_Test.h for the class definition
 CDbLayer_Test::CDbLayer_Test()
 	: m_bInit(false),
 	m_dataType(DataDecoder::eDTString)

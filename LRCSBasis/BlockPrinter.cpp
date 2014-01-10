@@ -1,5 +1,7 @@
 #include "BlockPrinter.h"
 #include <iostream>
+#include <omp.h>
+
 using namespace std;
 BlockPrinter::BlockPrinter(ostream *_destStream, DataSource* dataSrc_[], int numCols_[], int numSrcs_)
 {
@@ -55,14 +57,43 @@ void BlockPrinter::printColumns(bool skip_output) {
 		blks[i] = NULL;
 
 	PosOperator* posOperator = new PosOperator();
+	MultiPosFilterBlock** aryMPFB = new MultiPosFilterBlock*[numSrcs];
+
+#ifdef DEBUG
+	DWORD dwBeginTimeQueryDb = GetTickCount();
+#endif
+
+#pragma omp parallel for
+	for (int i = 0; i < numSrcs; i++)
+	{
+#ifdef DEBUG
+		int threadId = omp_get_thread_num();
+		aryMPFB[i] = dataSrc[i]->getPosOnPred();
+#endif
+		cout << "thread ID: " << threadId << endl;
+	}
+
 	for (int i = 0; i<numSrcs; i++){
 		//zklee: Currently only consider AND situtation
 		if (i>0)posOperator->addWhereOp('&');
-		posOperator->addPosBlock(dataSrc[i]->getPosOnPred());
+		posOperator->addPosBlock(aryMPFB[i]);
+		//posOperator->addPosBlock(dataSrc[i]->getPosOnPred());
 	}
+
 	posOperator->finishWhereOp();
+#ifdef DEBUG
+	DWORD dwEndTimeQueryDb = GetTickCount();
+#endif
 
 	posFilter = posOperator->getPosFilter();
+
+#ifdef DEBUG
+	DWORD dwEndTimeCalcPos = GetTickCount();
+
+	cout << "Query Db Time: " << dwEndTimeQueryDb - dwBeginTimeQueryDb << endl;
+	cout << "Calc Pos Time: " << dwEndTimeCalcPos - dwEndTimeQueryDb << endl;
+#endif
+	delete[] aryMPFB;
 	cout << posFilter->getNumValuesR() << endl;
 	//posFilter->printBlocks();
 	for (int i = 0; i<numSrcs; i++)

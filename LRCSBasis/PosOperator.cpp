@@ -2,25 +2,25 @@
 
 PosOperator::PosOperator(){
 	//caculatedPosBlock = new MultiPosFilterBlock();  
-	WhereOp = NULL;
+	m_pWhereOp = NULL;
 	Level = 0;
-	caculatedPosBlock = NULL;
-	tempPosBlock1 = NULL;
-	tempPosBlock2 = NULL;
-	cacuPosBlock = NULL;
+	//m_pCaculatedPosBlock = NULL;
+	m_pTempPosBlock1 = NULL;
+	m_pTempPosBlock2 = NULL;
+	//m_pCacuPosBlock = NULL;
 	intermOp = '\0';
-	prevOp = '\0';
+	//prevOp = '\0';
 	addWhereOp('(');//Start   
 }
 
 PosOperator::~PosOperator(){
 	//delete caculatedPosBlock;
-	currWhereOp = WhereOp;
+	m_pCurrWhereOp = m_pWhereOp;
 	whereOp* whereOpTemp;
-	while (currWhereOp != NULL){
-		whereOpTemp = currWhereOp;
+	while (m_pCurrWhereOp != NULL){
+		whereOpTemp = m_pCurrWhereOp;
 		//delete whereOpTemp->posBlock;
-		currWhereOp = whereOpTemp->nextOp;
+		m_pCurrWhereOp = whereOpTemp->nextOp;
 		delete whereOpTemp;
 	}
 }
@@ -34,12 +34,12 @@ bool PosOperator::addWhereOp(char op){
 	whereOpNew->op = op;
 	whereOpNew->nextOp = NULL;
 
-	if (WhereOp == NULL){
-		WhereOp = whereOpNew;
+	if (m_pWhereOp == NULL){
+		m_pWhereOp = whereOpNew;
 		return true;
 	}
 
-	whereOpTemp = WhereOp;
+	whereOpTemp = m_pWhereOp;
 	while (whereOpTemp->nextOp != NULL){
 		whereOpTemp = whereOpTemp->nextOp;
 	}
@@ -61,12 +61,12 @@ bool PosOperator::addPosBlock(MultiPosFilterBlock* posBlock){
 	whereOpNew->posBlock = posBlock;
 	whereOpNew->nextOp = NULL;
 
-	if (WhereOp == NULL){
-		WhereOp = whereOpNew;
+	if (m_pWhereOp == NULL){
+		m_pWhereOp = whereOpNew;
 		return true;
 	}
 
-	whereOpTemp = WhereOp;
+	whereOpTemp = m_pWhereOp;
 	while (whereOpTemp->nextOp != NULL){
 		whereOpTemp = whereOpTemp->nextOp;
 	}
@@ -75,31 +75,34 @@ bool PosOperator::addPosBlock(MultiPosFilterBlock* posBlock){
 }
 
 MultiPosFilterBlock*  PosOperator::getPosFilter(){
-	if (WhereOp == NULL)return NULL;
+	if (m_pWhereOp == NULL)return NULL;
 	MultiPosFilterBlock* intermPosBlock = NULL;
-	currWhereOp = WhereOp;
+	m_pCurrWhereOp = m_pWhereOp;
 	char op;
-	while (parseWhereOpreation(op, intermPosBlock)){
+	char prevOp = '\0';
+	while (parseWhereOpreation(op, intermPosBlock, prevOp)){
 		if (op == '&' && intermPosBlock != NULL && intermPosBlock->hasNext()){
-			caculatedPosBlock = doAndCaculate(caculatedPosBlock, intermPosBlock);
+			m_spCaculatedPosBlock.reset(doAndCaculate(m_spCaculatedPosBlock.get(), intermPosBlock));
+			delete intermPosBlock;
 			intermPosBlock = NULL;
 		}
 		else if (op == '|' && intermPosBlock != NULL && intermPosBlock->hasNext()){
-			caculatedPosBlock = doOrCaculate(caculatedPosBlock, intermPosBlock);
+			m_spCaculatedPosBlock.reset(doOrCaculate(m_spCaculatedPosBlock.get(), intermPosBlock));
+			delete intermPosBlock;
 			intermPosBlock = NULL;
 		}
 		else if (op == 0 && intermPosBlock != NULL && intermPosBlock->hasNext()){
-			caculatedPosBlock = intermPosBlock;
+			m_spCaculatedPosBlock.reset(intermPosBlock);
 			intermPosBlock = NULL;
 		}
 	}
-	return caculatedPosBlock;
+	return m_spCaculatedPosBlock.release();
 }
 
-bool PosOperator::parseWhereOpreation(char& op_, MultiPosFilterBlock* &intermPosBlock_){
+bool PosOperator::parseWhereOpreation(char& op_, MultiPosFilterBlock* &intermPosBlock_, char& prevOp){
 
-	if (currWhereOp == NULL)return false;
-	whereOp* tempWhereOp = currWhereOp;
+	if (m_pCurrWhereOp == NULL)return false;
+	whereOp* tempWhereOp = m_pCurrWhereOp;
 
 	op_ = '\0';
 
@@ -107,7 +110,7 @@ bool PosOperator::parseWhereOpreation(char& op_, MultiPosFilterBlock* &intermPos
 	case '(':
 		if (prevOp == 'P')return false; //Parse error! Change to exception later
 		if (prevOp == '&' || prevOp == '|'){
-			intermPosBlock_ = tempPosBlock1;
+			intermPosBlock_ = m_pTempPosBlock1;
 			intermOp = prevOp;
 		}
 		Level++;
@@ -115,9 +118,9 @@ bool PosOperator::parseWhereOpreation(char& op_, MultiPosFilterBlock* &intermPos
 	case ')':
 		if (prevOp == '(' || prevOp == '&' || prevOp == '|')return false; //Parse error!
 		if (prevOp == 'P'){
-			intermPosBlock_ = tempPosBlock1;
+			intermPosBlock_ = m_pTempPosBlock1;
 			op_ = intermOp;
-			tempPosBlock1 = NULL;
+			m_pTempPosBlock1 = NULL;
 		}
 		else if (prevOp == ')'){
 			intermPosBlock_ = NULL;
@@ -133,29 +136,29 @@ bool PosOperator::parseWhereOpreation(char& op_, MultiPosFilterBlock* &intermPos
 		break;
 	case 'P':
 		if (prevOp == 'P' || prevOp == ')')return false; //Parse error
-		if (prevOp == '(')tempPosBlock1 = tempWhereOp->posBlock->clone();
+		if (prevOp == '(')m_pTempPosBlock1 = tempWhereOp->posBlock->clone();
 		else if (prevOp == '&' || prevOp == '|'){
-			if (tempPosBlock1 == NULL){
-				tempPosBlock1 = tempWhereOp->posBlock->clone();
+			if (m_pTempPosBlock1 == NULL){
+				m_pTempPosBlock1 = tempWhereOp->posBlock->clone();
 				intermOp = prevOp;
 			}
-			else if (tempPosBlock2 == NULL){
-				tempPosBlock2 = tempWhereOp->posBlock->clone();
+			else if (m_pTempPosBlock2 == NULL){
+				m_pTempPosBlock2 = tempWhereOp->posBlock->clone();
 			}
 		}
 
-		if (tempPosBlock1 != NULL && tempPosBlock2 != NULL){
+		if (m_pTempPosBlock1 != NULL && m_pTempPosBlock2 != NULL){
 			if (prevOp == '&'){
-				tempPosBlock1 = doAndCaculate(tempPosBlock1, tempPosBlock2);
-				tempPosBlock2 = NULL;
+				m_pTempPosBlock1 = doAndCaculate(m_pTempPosBlock1, m_pTempPosBlock2);
+				m_pTempPosBlock2 = NULL;
 			}
 			else if (prevOp == '|'){
-				tempPosBlock1 = doOrCaculate(tempPosBlock1, tempPosBlock2);
-				tempPosBlock2 = NULL;
+				m_pTempPosBlock1 = doOrCaculate(m_pTempPosBlock1, m_pTempPosBlock2);
+				m_pTempPosBlock2 = NULL;
 			}
 			else{//Parse error!
-				delete tempPosBlock1;
-				delete tempPosBlock2;
+				delete m_pTempPosBlock1;
+				delete m_pTempPosBlock2;
 				return false;
 			}
 		}
@@ -166,11 +169,11 @@ bool PosOperator::parseWhereOpreation(char& op_, MultiPosFilterBlock* &intermPos
 
 	if (Level < 0 || Level >2)return false; //Parse error! Currently Only support 2 levels.
 	prevOp = tempWhereOp->op;
-	currWhereOp = tempWhereOp->nextOp;
+	m_pCurrWhereOp = tempWhereOp->nextOp;
 	return true;
 }
 
-MultiPosFilterBlock* PosOperator::doAndCaculate(MultiPosFilterBlock* posBlock1_, MultiPosFilterBlock* posBlock2_){
+MultiPosFilterBlock* PosOperator::doAndCaculate(MultiPosFilterBlock* posBlock1_, MultiPosFilterBlock* posBlock2_) const{
 	//if(cacuPosBlock)delete cacuPosBlock;
 	bool done = false;
 	bool firstTime = true;
@@ -185,30 +188,28 @@ MultiPosFilterBlock* PosOperator::doAndCaculate(MultiPosFilterBlock* posBlock1_,
 	unsigned int tempInt;
 
 	if (posBlock1_->isCompleteSet()){
-		delete posBlock1_;
+		//delete posBlock1_;
 		return posBlock2_;
 	}
 	else if (posBlock2_->isCompleteSet()){
-		delete posBlock2_;
+		//delete posBlock2_;
 		return posBlock1_;
 	}
 
 	if (posBlock1_->isNullSet()){
-		delete posBlock2_;
+		//delete posBlock2_;
 		return posBlock1_;
 	}
 	else if (posBlock2_->isNullSet()){
-		delete posBlock1_;
+		//delete posBlock1_;
 		return posBlock2_;
 	}
 
-	cacuPosBlock = new MultiPosFilterBlock();
+	auto_ptr<MultiPosFilterBlock> spCacuPosBlock(new MultiPosFilterBlock());
 	posFilterBlock1 = posBlock1_->getFirstBlock();
 	posFilterBlock2 = posBlock2_->getFirstBlock();
 
-	while (true){
-
-		if (posFilterBlock1 == NULL || posFilterBlock2 == NULL)break;//run out of the blocks
+	while (posFilterBlock1 != NULL && posFilterBlock2 != NULL){
 
 		if (posFilterBlock1->getCurrIntStartPos() > posFilterBlock2->getEndPosition()){
 			posFilterBlock2 = posBlock2_->getNextBlock();
@@ -240,7 +241,7 @@ MultiPosFilterBlock* PosOperator::doAndCaculate(MultiPosFilterBlock* posBlock1_,
 		while (!done){
 			tempInt = int1 & int2;
 			if (!tempPosFilterBlock->addInt(tempInt)){//if Block is full,create a new one
-				cacuPosBlock->addPosFilterBlock(tempPosFilterBlock);
+				spCacuPosBlock->addPosFilterBlock(tempPosFilterBlock);
 				tempPosFilterBlock = new PosFilterBlock();
 				tempPosFilterBlock->initEmptyBuffer(tempFilterBlock1->getCurrIntRealStartPos());
 				tempPosFilterBlock->setCurrInt(0);
@@ -263,21 +264,21 @@ MultiPosFilterBlock* PosOperator::doAndCaculate(MultiPosFilterBlock* posBlock1_,
 					posFilterBlock1 = posBlock1_->getNextBlock();
 					posFilterBlock2 = posBlock2_->getNextBlock();
 				}
-				cacuPosBlock->addPosFilterBlock(tempPosFilterBlock);
+				spCacuPosBlock->addPosFilterBlock(tempPosFilterBlock);
 				done = true;
 			}
 
 		}
 	}
 
-	delete posBlock1_;
-	delete posBlock2_;
-	cacuPosBlock->optimize();
-	cacuPosBlock->setCurrBlock(0);
-	return cacuPosBlock;
+	//delete posBlock1_;
+	//delete posBlock2_;
+	spCacuPosBlock->optimize();
+	spCacuPosBlock->setCurrBlock(0);
+	return spCacuPosBlock.release();
 }
 
-MultiPosFilterBlock* PosOperator::doOrCaculate(MultiPosFilterBlock* posBlock1_, MultiPosFilterBlock* posBlock2_){
+MultiPosFilterBlock* PosOperator::doOrCaculate(MultiPosFilterBlock* posBlock1_, MultiPosFilterBlock* posBlock2_) const{
 	//if(cacuPosBlock)delete cacuPosBlock;
 	bool done = false;
 
@@ -294,36 +295,36 @@ MultiPosFilterBlock* PosOperator::doOrCaculate(MultiPosFilterBlock* posBlock1_, 
 	unsigned int tempInt;
 
 	if (posBlock1_->isCompleteSet()){
-		delete posBlock2_;
+		//delete posBlock2_;
 		return posBlock1_;
 	}
 	else if (posBlock2_->isCompleteSet()){
-		delete posBlock1_;
+		//delete posBlock1_;
 		return posBlock2_;
 	}
 
 	if (posBlock1_->isNullSet()){
-		delete posBlock1_;
+		//delete posBlock1_;
 		return posBlock2_;
 	}
 	else if (posBlock2_->isNullSet()){
-		delete posBlock2_;
+		//delete posBlock2_;
 		return posBlock1_;
 	}
 
-	cacuPosBlock = new MultiPosFilterBlock();
+	auto_ptr<MultiPosFilterBlock> spCacuPosBlock(new MultiPosFilterBlock);
 	posFilterBlock1 = posBlock1_->getFirstBlock();
 	posFilterBlock2 = posBlock2_->getFirstBlock();
 	//bool ifPrint;
 	while (true){
 
 		if (posFilterBlock1 == NULL && posFilterBlock2 != NULL){
-			cacuPosBlock->addPosFilterBlock(posFilterBlock2->cutGetRightAtPos(posFilterBlock2->getCurrIntStartPos())->clone());
+			spCacuPosBlock->addPosFilterBlock(posFilterBlock2->cutGetRightAtPos(posFilterBlock2->getCurrIntStartPos())->clone());
 			posFilterBlock2 = ((MultiPosFilterBlock*)(posFilterBlock2->parentMultiBlock))->getNextBlock();
 			continue;
 		}
 		else if (posFilterBlock1 != NULL && posFilterBlock2 == NULL){
-			cacuPosBlock->addPosFilterBlock(posFilterBlock1->cutGetRightAtPos(posFilterBlock1->getCurrIntStartPos())->clone());
+			spCacuPosBlock->addPosFilterBlock(posFilterBlock1->cutGetRightAtPos(posFilterBlock1->getCurrIntStartPos())->clone());
 			posFilterBlock1 = ((MultiPosFilterBlock*)(posFilterBlock1->parentMultiBlock))->getNextBlock();
 			continue;
 		}
@@ -335,13 +336,13 @@ MultiPosFilterBlock* PosOperator::doOrCaculate(MultiPosFilterBlock* posBlock1_, 
 		}*/
 
 		if (posFilterBlock1->getCurrIntStartPos() > posFilterBlock2->getEndPosition()){
-			cacuPosBlock->addPosFilterBlock(posFilterBlock2->cutGetRightAtPos(posFilterBlock2->getCurrIntStartPos())->clone());
+			spCacuPosBlock->addPosFilterBlock(posFilterBlock2->cutGetRightAtPos(posFilterBlock2->getCurrIntStartPos())->clone());
 			posFilterBlock2 = ((MultiPosFilterBlock*)(posFilterBlock2->parentMultiBlock))->getNextBlock();
 			continue;
 		}
 
 		if (posFilterBlock2->getCurrIntStartPos() > posFilterBlock1->getEndPosition()){
-			cacuPosBlock->addPosFilterBlock(posFilterBlock1->cutGetRightAtPos(posFilterBlock1->getCurrIntStartPos())->clone());
+			spCacuPosBlock->addPosFilterBlock(posFilterBlock1->cutGetRightAtPos(posFilterBlock1->getCurrIntStartPos())->clone());
 			posFilterBlock1 = ((MultiPosFilterBlock*)(posFilterBlock1->parentMultiBlock))->getNextBlock();
 			continue;
 		}
@@ -362,7 +363,7 @@ MultiPosFilterBlock* PosOperator::doOrCaculate(MultiPosFilterBlock* posBlock1_, 
 				tempFilterBlock1 = posFilterBlock2;
 				tempFilterBlock2 = posFilterBlock1;
 			}
-			cacuPosBlock->addPosFilterBlock(tempFilterBlock2->clone()->cutGetLeftAtPos((tempFilterBlock1->getCurrIntStartPos() - 1)));
+			spCacuPosBlock->addPosFilterBlock(tempFilterBlock2->clone()->cutGetLeftAtPos((tempFilterBlock1->getCurrIntStartPos() - 1)));
 			int1 = tempFilterBlock1->getCurrIntValue();
 			tempFilterBlock2->cutGetRightAtPos(tempFilterBlock1->getCurrIntStartPos());
 			int2 = tempFilterBlock2->getCurrIntValue();
@@ -375,7 +376,7 @@ MultiPosFilterBlock* PosOperator::doOrCaculate(MultiPosFilterBlock* posBlock1_, 
 		while (!done){
 			tempInt = int1 | int2;
 			if (!tempPosFilterBlock->addInt(tempInt)){//if Block is full,create a new one
-				cacuPosBlock->addPosFilterBlock(tempPosFilterBlock);
+				spCacuPosBlock->addPosFilterBlock(tempPosFilterBlock);
 				tempPosFilterBlock = new PosFilterBlock();
 				tempPosFilterBlock->initEmptyBuffer(tempFilterBlock1->getCurrIntRealStartPos());
 				tempPosFilterBlock->setCurrInt(0);
@@ -400,18 +401,18 @@ MultiPosFilterBlock* PosOperator::doOrCaculate(MultiPosFilterBlock* posBlock1_, 
 					posFilterBlock1 = posBlock1_->getNextBlock();
 					posFilterBlock2 = posBlock2_->getNextBlock();
 				}
-				cacuPosBlock->addPosFilterBlock(tempPosFilterBlock);
+				spCacuPosBlock->addPosFilterBlock(tempPosFilterBlock);
 				done = true;
 			}
 
 		}
 	}
 
-	delete posBlock1_;
-	delete posBlock2_;
-	cacuPosBlock->optimize();
-	cacuPosBlock->setCurrBlock(0);
+	//delete posBlock1_;
+	//delete posBlock2_;
+	spCacuPosBlock->optimize();
+	spCacuPosBlock->setCurrBlock(0);
 	//cacuPosBlock->getNumValuesR();
 	//if(ifPrint)cacuPosBlock->printBlocks();
-	return cacuPosBlock;
+	return spCacuPosBlock.release();
 }
