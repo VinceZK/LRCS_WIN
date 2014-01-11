@@ -55,7 +55,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>Create</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LRCSBASIS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -133,6 +133,7 @@
     <ClInclude Include="Operator.h" />
     <ClInclude Include="PagePlacer.h" />
     <ClInclude Include="PageWriter.h" />
+    <ClInclude Include="ParallelHelper.h" />
     <ClInclude Include="PosBlock.h" />
     <ClInclude Include="PosDecoder.h" />
     <ClInclude Include="PosEncoder.h" />
@@ -347,6 +348,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="ParallelHelper.cpp" />
     <ClCompile Include="PosBlock.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>

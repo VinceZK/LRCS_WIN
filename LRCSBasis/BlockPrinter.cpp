@@ -1,5 +1,6 @@
 #include "BlockPrinter.h"
 #include <iostream>
+#include "ParallelHelper.h"
 #include <omp.h>
 
 using namespace std;
@@ -63,21 +64,20 @@ void BlockPrinter::printColumns(bool skip_output) {
 	DWORD dwBeginTimeQueryDb = GetTickCount();
 #endif
 
-#pragma omp parallel for
+#pragma omp parallel for num_threads(ParallelHelper::GetThreadNumber(numSrcs))
 	for (int i = 0; i < numSrcs; i++)
 	{
 #ifdef DEBUG
 		int threadId = omp_get_thread_num();
-		aryMPFB[i] = dataSrc[i]->getPosOnPred();
-#endif
 		cout << "thread ID: " << threadId << endl;
+#endif
+		aryMPFB[i] = dataSrc[i]->getPosOnPred();
 	}
 
 	for (int i = 0; i<numSrcs; i++){
 		//zklee: Currently only consider AND situtation
 		if (i>0)posOperator->addWhereOp('&');
 		posOperator->addPosBlock(aryMPFB[i]);
-		//posOperator->addPosBlock(dataSrc[i]->getPosOnPred());
 	}
 
 	posOperator->finishWhereOp();
@@ -93,7 +93,6 @@ void BlockPrinter::printColumns(bool skip_output) {
 	cout << "Query Db Time: " << dwEndTimeQueryDb - dwBeginTimeQueryDb << endl;
 	cout << "Calc Pos Time: " << dwEndTimeCalcPos - dwEndTimeQueryDb << endl;
 #endif
-	delete[] aryMPFB;
 	cout << posFilter->getNumValuesR() << endl;
 	//posFilter->printBlocks();
 	for (int i = 0; i<numSrcs; i++)
@@ -109,6 +108,7 @@ void BlockPrinter::printColumns(bool skip_output) {
 		}
 		++nprinted;
 	}
+	delete[] aryMPFB;
 	delete[] blks;
 	delete posFilter;
 	delete posOperator;
