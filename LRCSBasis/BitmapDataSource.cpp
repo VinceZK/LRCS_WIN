@@ -8,31 +8,29 @@ BitmapDataSource::BitmapDataSource(AM* am_, bool valSorted_, bool isROS, Decoder
 : DataSource(am_, isROS)
 {
 	valSorted = valSorted_;
-	decoder = new LZDecoder(decoder_);
+	m_spDecoder.reset(new LZDecoder(decoder_));
 	//decoder = new StringDecoder(true);
 }
 
 
 BitmapDataSource::~BitmapDataSource()
 {
-
-	if (decoder != NULL) delete decoder;
 	//if (currBlock!=NULL) delete currBlock;
 }
 
 //Get the position block on predicaiton
 MultiPosFilterBlock* BitmapDataSource::getPosOnPred(){
-	if (pred == NULL){
+	if (m_pPred == NULL){
 		matchedPredPos = new MultiPosFilterBlock();
 		matchedPredPos->setCompleteSet(true);
 	}
 	else{
 		predChanged = false;//Reset predChanged
 
-		ValPos* rhsvp = pred->getRHS();
+		ValPos* rhsvp = m_pPred->getRHS();
 		char* rhsval = (char*)rhsvp->value;
 		ValPos* tempVP = rhsvp->clone();
-		int valsize = pred->getRHS()->getSize();
+		int valsize = m_pPred->getRHS()->getSize();
 		unsigned char* temp;
 		temp = StringUtil::getSmallestLargerValue(rhsval, valsize);
 		tempVP->set(temp);
@@ -59,7 +57,7 @@ bool BitmapDataSource::getPosOnPredValueUnsorted(ROSAM* am_, ValPos* rhsvp_, Val
 
 	while (!done){
 		//01. get a page from BDB
-		switch (pred->getPredType()) {
+		switch (m_pPred->getPredType()) {
 		case Predicate::OP_GREATER_THAN:
 			if (firstCall)
 				page = (byte*)am_->getDbPageRange(temp);
@@ -122,7 +120,7 @@ bool BitmapDataSource::getPosOnPredValueUnsorted(ROSAM* am_, ValPos* rhsvp_, Val
 
 // Finds the right block on the page
 bool BitmapDataSource::skipToRightPosOnPage(unsigned int pos_) {
-	if (decoder->skipToPos(pos_))
+	if (m_spDecoder->skipToPos(pos_))
 		return true;
 	else
 		return false;

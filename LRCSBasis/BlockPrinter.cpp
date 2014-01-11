@@ -2,6 +2,7 @@
 #include <iostream>
 #include "ParallelHelper.h"
 #include <omp.h>
+#include <process.h>
 
 using namespace std;
 BlockPrinter::BlockPrinter(ostream *_destStream, DataSource* dataSrc_[], int numCols_[], int numSrcs_)
@@ -42,6 +43,33 @@ BlockPrinter::~BlockPrinter()
 }
 
 void BlockPrinter::printColumns(bool skip_output) {
+	wrapperOfPrintColumns(skip_output, false);
+}
+
+void BlockPrinter::printColumnsToStream() {
+	wrapperOfPrintColumns(true, true);
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Here are for the multi-thread to calc the datasource
+struct tParams
+{
+	DataSource* pDataSrc;
+	MultiPosFilterBlock* pResult;
+};
+unsigned __stdcall threadFunc_DataSrc(void* params)
+{
+	tParams* pThis = (tParams*)params;
+
+	pThis->pResult = pThis->pDataSrc->getPosOnPred();
+
+	return 1;
+}
+// End
+/////////////////////////////////////////////////////////////////////////////
+
+void BlockPrinter::wrapperOfPrintColumns(bool bSkipOutput, bool bOutStream)
+{
 	using namespace std;
 	int totalNumCols = 0;
 	int currCol;
@@ -60,17 +88,53 @@ void BlockPrinter::printColumns(bool skip_output) {
 	PosOperator* posOperator = new PosOperator();
 	MultiPosFilterBlock** aryMPFB = new MultiPosFilterBlock*[numSrcs];
 
+	tParams* pParams = new tParams[numSrcs];
+	for (size_t i = 0; i < numSrcs; i++)
+	{
+		pParams[i].pDataSrc = dataSrc[i];
+		pParams[i].pResult = NULL;
+	}
 #ifdef DEBUG
 	DWORD dwBeginTimeQueryDb = GetTickCount();
 #endif
+	////////////////////////////////////////////////////////////////////////////////////////
+	// Here uses the multi-thread to calc the result.
+	/*
+	HANDLE* pThreadHandles = new HANDLE[numSrcs];
 
-#pragma omp parallel for num_threads(ParallelHelper::GetThreadNumber(numSrcs))
+	for (size_t i = 0; i < numSrcs; i++)
+	{
+		pThreadHandles[i] = (HANDLE)_beginthreadex(NULL, 0, &threadFunc_DataSrc, &pParams[i], 0, NULL);
+	}
+	DWORD dwRet = ::WaitForMultipleObjects(numSrcs, pThreadHandles, true, 5000);
+
+	for (size_t i = 0; i < numSrcs; i++)
+	{
+		aryMPFB[i] = pParams[i].pResult;
+		::CloseHandle(pThreadHandles[i]);
+	}
+
+	delete[] pThreadHandles;
+	delete[] pParams;
+
+	for (int i = 0; i<numSrcs; i++){
+		//zklee: Currently only consider AND situtation
+		if (i>0)posOperator->addWhereOp('&');
+		posOperator->addPosBlock(aryMPFB[i]);
+	}
+	*/
+	// End -- multi-thread
+	/////////////////////////////////////////////////////////////////////////////////////////
+
+	/////////////////////////////////////////////////////////////////////////////////////////
+	// Here uses the parallel to calc result by OpenMP.
+#pragma omp parallel for //num_threads(ParallelHelper::GetThreadNumber(numSrcs))
 	for (int i = 0; i < numSrcs; i++)
 	{
-#ifdef DEBUG
-		int threadId = omp_get_thread_num();
-		cout << "thread ID: " << threadId << endl;
-#endif
+//#ifdef DEBUG
+//		int threadId = omp_get_thread_num();
+//		cout << "thread ID: " << threadId << endl;
+//#endif
 		aryMPFB[i] = dataSrc[i]->getPosOnPred();
 	}
 
@@ -78,7 +142,21 @@ void BlockPrinter::printColumns(bool skip_output) {
 		//zklee: Currently only consider AND situtation
 		if (i>0)posOperator->addWhereOp('&');
 		posOperator->addPosBlock(aryMPFB[i]);
+	}	
+	// End -- OpenMP
+	/////////////////////////////////////////////////////////////////////////////////////////
+
+	/////////////////////////////////////////////////////////////////////////////////////////
+	// Here is single thread.
+	/*
+	for (int i = 0; i<numSrcs; i++){
+		//zklee: Currently only consider AND situtation
+		if (i>0)posOperator->addWhereOp('&');
+		posOperator->addPosBlock(dataSrc[i]->getPosOnPred());
 	}
+	*/
+	// End -- single thread
+	/////////////////////////////////////////////////////////////////////////////////////////
 
 	posOperator->finishWhereOp();
 #ifdef DEBUG
@@ -102,7 +180,7 @@ void BlockPrinter::printColumns(bool skip_output) {
 		currCol = 0;
 		for (int i = 0; i<numSrcs; i++) {
 			for (int j = 0; j < numCols[i]; j++) {
-				success &= printEntryForColumn(dataSrc[i], j, currCol, currCol == totalNumCols - 1, skip_output);
+				success &= printEntryForColumn(dataSrc[i], j, currCol, currCol == totalNumCols - 1, bSkipOutput, bOutStream);
 				currCol++;
 			}
 		}
@@ -114,50 +192,6 @@ void BlockPrinter::printColumns(bool skip_output) {
 	delete posOperator;
 }
 
-void BlockPrinter::printColumnsToStream() {
-	using namespace std;
-	int totalNumCols = 0;
-	int currCol;
-	bool success = true;
-	//PosBlock* posB;
-	//Operator* PosFilter;
-	MultiPosFilterBlock* posFilter;
-
-	for (int i = 0; i<numSrcs; i++) {
-		totalNumCols += numCols[i];
-	}
-	blks = new Block*[totalNumCols];
-	for (int i = 0; i<totalNumCols; i++)
-		blks[i] = NULL;
-
-	PosOperator* posOperator = new PosOperator();
-	for (int i = 0; i<numSrcs; i++){
-		//zklee: Currently only consider AND situtation
-		if (i>0)posOperator->addWhereOp('&');
-		posOperator->addPosBlock(dataSrc[i]->getPosOnPred());
-	}
-	posOperator->finishWhereOp();
-
-	posFilter = posOperator->getPosFilter();
-	cout << posFilter->getNumValuesR() << endl;
-	//posFilter->printBlocks();
-	for (int i = 0; i<numSrcs; i++)
-		dataSrc[i]->setPositionFilter(posFilter);
-
-	while (success) {
-		currCol = 0;
-		for (int i = 0; i<numSrcs; i++) {
-			for (int j = 0; j < numCols[i]; j++) {
-				success &= printEntryForColumnToStream(dataSrc[i], j, currCol, currCol == totalNumCols - 1);
-				currCol++;
-			}
-		}
-		++nprinted;
-	}
-	delete[] blks;
-	delete posFilter;
-	delete posOperator;
-}
 
 void BlockPrinter::printColumnsWithPosition() {
 	for (int i = 0; i<numSrcs; i++) {
@@ -165,9 +199,7 @@ void BlockPrinter::printColumnsWithPosition() {
 	}
 }
 
-
-
-bool BlockPrinter::printEntryForColumn(DataSource* dataSrc_, int currCol, int currTotalCol, bool isLast, bool skip_output) {
+bool BlockPrinter::printEntryForColumn(DataSource* dataSrc_, int currCol, int currTotalCol, bool isLast, bool skip_output, bool bOutStream) {
 	using namespace std;
 	if (dataSrc_ == NULL) return false;
 	if (blks[currTotalCol] == NULL){
@@ -178,20 +210,32 @@ bool BlockPrinter::printEntryForColumn(DataSource* dataSrc_, int currCol, int cu
 	ValPos* pair = blks[currTotalCol]->getNext();
 	// DSM disable printing
 	if (!skip_output) {
-		if (stdOut) {
-			pair->printVal(&cout);
-			if (isLast)
-				cout << endl;
+		if (!bOutStream)
+		{
+			if (stdOut) {
+				pair->printVal(&cout);
+				if (isLast)
+					cout << endl;
+				else
+					cout << ",";
+			}
 			else
-				cout << ",";
+			{
+				pair->printVal(&outstream);
+				if (isLast)
+					outstream << endl;
+				else
+					outstream << ",";
+			}		
 		}
 		else
 		{
-			pair->printVal(&outstream);
+			pair->printVal(this->destStream);
 			if (isLast)
-				outstream << endl;
+				(*destStream) << endl;
+			//*destStream << endl;
 			else
-				outstream << ",";
+				(*destStream) << ",";
 		}
 	}
 
@@ -202,34 +246,6 @@ bool BlockPrinter::printEntryForColumn(DataSource* dataSrc_, int currCol, int cu
 	return true;
 
 }
-
-bool BlockPrinter::printEntryForColumnToStream(DataSource* dataSrc_, int currCol, int currTotalCol, bool isLast) {
-	using namespace std;
-	if (dataSrc_ == NULL) return false;
-	if (blks[currTotalCol] == NULL){
-		blks[currTotalCol] = dataSrc_->getNextValBlock(currCol);
-		if (blks[currTotalCol] == NULL)return false;
-	}
-
-	ValPos* pair = blks[currTotalCol]->getNext();
-	
-	pair->printVal(this->destStream);
-	if (isLast)
-		(*destStream) << endl;
-	//*destStream << endl;
-	else
-		(*destStream) << ",";
-	//*destStream << ",";
-
-	//BUG FIX: hasNext might be false now, but true next time this is called since the data blks[currTotalCol] is pointing to can be updated. However, we want to force getNextValBlock to be called to update the pointer, so put NULL in blks[currTotalCol] if !hasNext
-
-	if (!blks[currTotalCol]->hasNext())
-		blks[currTotalCol] = NULL;
-	return true;
-
-}
-
-
 
 void BlockPrinter::printColumnsForSrc(DataSource* dataSrc_, int numCols_) {
 	using namespace std;
@@ -237,9 +253,11 @@ void BlockPrinter::printColumnsForSrc(DataSource* dataSrc_, int numCols_) {
 	if (dataSrc_ == NULL) return;
 	//Block* blks[numCols_];
 	vector<Block*> blks(numCols_);
+
 	for (int i = 0; i<numCols_; i++) {
 		blks[i] = dataSrc_->getNextValBlock(i);
 	}
+
 	while (blks[0] != NULL) {
 		for (int j = 0; j<blks[0]->getSize(); j++) {
 			for (int col = 0; col<numCols_ - 1; col++) {
@@ -289,9 +307,11 @@ void BlockPrinter::printColumnsWithPositionForSrc(DataSource* dataSrc_, int numC
 	if (dataSrc_ == NULL) return;
 	//Block* blks[numCols_];
 	vector<Block*> blks(numCols_);
+
 	for (int i = 0; i<numCols_; i++) {
 		blks[i] = dataSrc_->getNextValBlock(i);
 	}
+
 	while (blks[0] != NULL) {
 		for (int j = 0; j<blks[0]->getSize(); j++) {
 			for (int col = 0; col<numCols_ - 1; col++) {

@@ -8,31 +8,29 @@ RLEDataSource::RLEDataSource(AM* am_, bool valSorted_, bool isROS, Decoder* deco
 : DataSource(am_, isROS)
 {
 	valSorted = valSorted_;
-	decoder = new LZDecoder(decoder_);
+	m_spDecoder.reset(new LZDecoder(decoder_));
 	//decoder = new StringDecoder(true);
 }
 
 
 RLEDataSource::~RLEDataSource()
 {
-
-	if (decoder != NULL) delete decoder;
 	//if (currBlock!=NULL) delete currBlock;
 }
 
 //Get the position block on predicaiton
 MultiPosFilterBlock* RLEDataSource::getPosOnPred(){
-	if (pred == NULL){
+	if (m_pPred == NULL){
 		matchedPredPos = new MultiPosFilterBlock();
 		matchedPredPos->setCompleteSet(true);
 	}
 	else{
 		predChanged = false;//Reset predChanged
 
-		ValPos* rhsvp = pred->getRHS();
+		ValPos* rhsvp = m_pPred->getRHS();
 		char* rhsval = (char*)rhsvp->value;
 		ValPos* tempVP = rhsvp->clone();
-		int valsize = pred->getRHS()->getSize();
+		int valsize = m_pPred->getRHS()->getSize();
 		unsigned char* temp;
 		temp = StringUtil::getSmallestLargerValue(rhsval, valsize);
 		tempVP->set(temp);
@@ -57,7 +55,7 @@ bool RLEDataSource::getPosOnPredValueUnsorted(ROSAM* am_, ValPos* rhsvp_, ValPos
 
 	while (!done){
 		//01. get a page from BDB
-		switch (pred->getPredType()) {
+		switch (m_pPred->getPredType()) {
 		case Predicate::OP_GREATER_THAN:
 			if (firstCall)
 				page = (byte*)am_->getDbPageRange(temp);

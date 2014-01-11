@@ -7,6 +7,8 @@
 #include "StringDecoder.h"
 #include "MultiPosFilterCursor.h"
 #include "ROSAM.h"
+
+#include <memory>
 //#include "stdafx.h"
 // Super class that:
 //	-Gets data from the AM
@@ -48,8 +50,8 @@ public:
 
 protected:
 	AM* am;
-	Predicate* pred;
-	Decoder* decoder;
+	Predicate* m_pPred;
+	auto_ptr<Decoder> m_spDecoder;
 	MultiBlock* currBlock;
 
 	bool posPrimaryIndex;

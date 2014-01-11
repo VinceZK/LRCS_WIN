@@ -21,9 +21,13 @@ public:
 	void printColumnsWithPosition();
 	int getNumPrinted() { return nprinted; }
 protected:
+	/// Encapsulat the logic of the printColumns() and the printColumnsToStream()
+	/// since the most logic are same.
+	void wrapperOfPrintColumns(bool bSkipOutput, bool bOutStream);
+
 	void printColumnsForSrc(DataSource* dataSrc_, int numCols_);
-	bool printEntryForColumn(DataSource* dataSrc_, int currCol, int currTotalCol, bool isLast, bool skip_output);
-	bool printEntryForColumnToStream(DataSource* dataSrc_, int currCol, int currTotalCol, bool isLast);
+	bool printEntryForColumn(DataSource* dataSrc_, int currCol, int currTotalCol, bool isLast, bool skip_output, bool bOutStream = false);
+	//bool printEntryForColumnToStream(DataSource* dataSrc_, int currCol, int currTotalCol, bool isLast);
 	void printColumnsWithPositionForSrc(DataSource* dataSrc_, int numCols_);
 	DataSource** dataSrc;
 	std::ofstream outstream;
