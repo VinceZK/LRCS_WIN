@@ -1,8 +1,15 @@
+#include "stdafx.h"
 #include "BlockPrinter.h"
 #include <iostream>
 #include "ParallelHelper.h"
 #include <omp.h>
 #include <process.h>
+
+//// There are three ways to calc the data from the datasource.
+//	1 -- Single Thread
+//  2 -- MultiThread
+//  3 -- OpenMP
+int BlockPrinter::MULTITHREAD_WAY = 1;
 
 using namespace std;
 BlockPrinter::BlockPrinter(ostream *_destStream, DataSource* dataSrc_[], int numCols_[], int numSrcs_)
@@ -50,24 +57,6 @@ void BlockPrinter::printColumnsToStream() {
 	wrapperOfPrintColumns(true, true);
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Here are for the multi-thread to calc the datasource
-struct tParams
-{
-	DataSource* pDataSrc;
-	MultiPosFilterBlock* pResult;
-};
-unsigned __stdcall threadFunc_DataSrc(void* params)
-{
-	tParams* pThis = (tParams*)params;
-
-	pThis->pResult = pThis->pDataSrc->getPosOnPred();
-
-	return 1;
-}
-// End
-/////////////////////////////////////////////////////////////////////////////
-
 void BlockPrinter::wrapperOfPrintColumns(bool bSkipOutput, bool bOutStream)
 {
 	using namespace std;
@@ -88,75 +77,69 @@ void BlockPrinter::wrapperOfPrintColumns(bool bSkipOutput, bool bOutStream)
 	PosOperator* posOperator = new PosOperator();
 	MultiPosFilterBlock** aryMPFB = new MultiPosFilterBlock*[numSrcs];
 
-	tParams* pParams = new tParams[numSrcs];
-	for (size_t i = 0; i < numSrcs; i++)
-	{
-		pParams[i].pDataSrc = dataSrc[i];
-		pParams[i].pResult = NULL;
-	}
 #ifdef DEBUG
 	DWORD dwBeginTimeQueryDb = GetTickCount();
 #endif
-	////////////////////////////////////////////////////////////////////////////////////////
-	// Here uses the multi-thread to calc the result.
-	/*
-	HANDLE* pThreadHandles = new HANDLE[numSrcs];
-
-	for (size_t i = 0; i < numSrcs; i++)
+	if (MULTITHREAD_WAY == 2)
 	{
-		pThreadHandles[i] = (HANDLE)_beginthreadex(NULL, 0, &threadFunc_DataSrc, &pParams[i], 0, NULL);
-	}
-	DWORD dwRet = ::WaitForMultipleObjects(numSrcs, pThreadHandles, true, 5000);
+		// Here uses the multi-thread to calc the result.
+		HANDLE* pThreadHandles = new HANDLE[numSrcs];
 
-	for (size_t i = 0; i < numSrcs; i++)
+		ParallelHelper::tParams* pParams = new ParallelHelper::tParams[numSrcs];
+		for (size_t i = 0; i < numSrcs; i++)
+		{
+			pParams[i].pDataSrc = dataSrc[i];
+			pParams[i].pResult = NULL;
+		}
+
+		for (size_t i = 0; i < numSrcs; i++)
+		{
+			pThreadHandles[i] = (HANDLE)_beginthreadex(NULL, 0, &ParallelHelper::threadFunc_DataSrc, &pParams[i], 0, NULL);
+		}
+		DWORD dwRet = ::WaitForMultipleObjects(numSrcs, pThreadHandles, true, 5000);
+
+		for (size_t i = 0; i < numSrcs; i++)
+		{
+			aryMPFB[i] = pParams[i].pResult;
+			::CloseHandle(pThreadHandles[i]);
+		}
+
+		delete[] pThreadHandles;
+		delete[] pParams;
+
+		for (int i = 0; i<numSrcs; i++){
+			//zklee: Currently only consider AND situtation
+			if (i>0)posOperator->addWhereOp('&');
+			posOperator->addPosBlock(aryMPFB[i]);
+		}
+	}
+	else if (MULTITHREAD_WAY == 3)
 	{
-		aryMPFB[i] = pParams[i].pResult;
-		::CloseHandle(pThreadHandles[i]);
+		// Here is the OpenMP
+#pragma omp parallel for num_threads(ParallelHelper::GetThreadNumber(numSrcs))
+		for (int i = 0; i < numSrcs; i++)
+		{
+	//#ifdef DEBUG
+	//		int threadId = omp_get_thread_num();
+	//		cout << "thread ID: " << threadId << endl;
+	//#endif
+			aryMPFB[i] = dataSrc[i]->getPosOnPred();
+		}
+
+		for (int i = 0; i<numSrcs; i++){
+			//zklee: Currently only consider AND situtation
+			if (i>0)posOperator->addWhereOp('&');
+			posOperator->addPosBlock(aryMPFB[i]);
+		}	
 	}
-
-	delete[] pThreadHandles;
-	delete[] pParams;
-
-	for (int i = 0; i<numSrcs; i++){
-		//zklee: Currently only consider AND situtation
-		if (i>0)posOperator->addWhereOp('&');
-		posOperator->addPosBlock(aryMPFB[i]);
+	else
+	{// Here is single thread.
+		for (int i = 0; i<numSrcs; i++){
+			//zklee: Currently only consider AND situtation
+			if (i>0)posOperator->addWhereOp('&');
+			posOperator->addPosBlock(dataSrc[i]->getPosOnPred());
+		}
 	}
-	*/
-	// End -- multi-thread
-	/////////////////////////////////////////////////////////////////////////////////////////
-
-	/////////////////////////////////////////////////////////////////////////////////////////
-	// Here uses the parallel to calc result by OpenMP.
-#pragma omp parallel for //num_threads(ParallelHelper::GetThreadNumber(numSrcs))
-	for (int i = 0; i < numSrcs; i++)
-	{
-//#ifdef DEBUG
-//		int threadId = omp_get_thread_num();
-//		cout << "thread ID: " << threadId << endl;
-//#endif
-		aryMPFB[i] = dataSrc[i]->getPosOnPred();
-	}
-
-	for (int i = 0; i<numSrcs; i++){
-		//zklee: Currently only consider AND situtation
-		if (i>0)posOperator->addWhereOp('&');
-		posOperator->addPosBlock(aryMPFB[i]);
-	}	
-	// End -- OpenMP
-	/////////////////////////////////////////////////////////////////////////////////////////
-
-	/////////////////////////////////////////////////////////////////////////////////////////
-	// Here is single thread.
-	/*
-	for (int i = 0; i<numSrcs; i++){
-		//zklee: Currently only consider AND situtation
-		if (i>0)posOperator->addWhereOp('&');
-		posOperator->addPosBlock(dataSrc[i]->getPosOnPred());
-	}
-	*/
-	// End -- single thread
-	/////////////////////////////////////////////////////////////////////////////////////////
 
 	posOperator->finishWhereOp();
 #ifdef DEBUG
@@ -168,8 +151,8 @@ void BlockPrinter::wrapperOfPrintColumns(bool bSkipOutput, bool bOutStream)
 #ifdef DEBUG
 	DWORD dwEndTimeCalcPos = GetTickCount();
 
-	cout << "Query Db Time: " << dwEndTimeQueryDb - dwBeginTimeQueryDb << endl;
-	cout << "Calc Pos Time: " << dwEndTimeCalcPos - dwEndTimeQueryDb << endl;
+	cout << "Query Db Time: " << (double)(dwEndTimeQueryDb - dwBeginTimeQueryDb)/1000 << "s" << endl;
+	cout << "Calc Pos Time: " << (double)(dwEndTimeCalcPos - dwEndTimeQueryDb)/1000 << "s" << endl;
 #endif
 	cout << posFilter->getNumValuesR() << endl;
 	//posFilter->printBlocks();
@@ -204,7 +187,8 @@ bool BlockPrinter::printEntryForColumn(DataSource* dataSrc_, int currCol, int cu
 	if (dataSrc_ == NULL) return false;
 	if (blks[currTotalCol] == NULL){
 		blks[currTotalCol] = dataSrc_->getNextValBlock(currCol);
-		if (blks[currTotalCol] == NULL)return false;
+		if (blks[currTotalCol] == NULL)
+			return false;
 	}
 
 	ValPos* pair = blks[currTotalCol]->getNext();

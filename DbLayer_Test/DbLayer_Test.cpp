@@ -73,7 +73,7 @@ std::vector<tstring> CDbLayer_Test::GetFirstData()
 		memset(&data, 0, sizeof(Dbt));
 		if(0 == m_pCursor->get(&key, &data, DB_FIRST))
 		{
-			result.push_back(_T("key:") + DataDecoder().ToString((BYTE*)key.get_data(), key.get_size(), m_dataType));
+			result.push_back(_T("key:") + DataDecoder().ToString((BYTE*)key.get_data(), key.get_size(), key.get_size() == 4 ? DataDecoder::eDTInt : m_dataType));
 			result.push_back(_T("value:") + DataDecoder().ToString((BYTE*)data.get_data(), data.get_size(), data.get_size() == 4 ? DataDecoder::eDTInt : m_dataType));
 		}
 	}
@@ -89,7 +89,7 @@ std::vector<tstring> CDbLayer_Test::GetNextData()
 	memset(&data, 0, sizeof(Dbt));
 	if (0 == m_pCursor->get(&key, &data, DB_NEXT))
 	{
-		result.push_back(_T("key:") + DataDecoder().ToString((BYTE*)key.get_data(), key.get_size(), m_dataType));
+		result.push_back(_T("key:") + DataDecoder().ToString((BYTE*)key.get_data(), key.get_size(), key.get_size() == 4 ? DataDecoder::eDTInt : m_dataType));
 		result.push_back(_T("value:") + DataDecoder().ToString((BYTE*)data.get_data(), data.get_size(), data.get_size() == 4 ? DataDecoder::eDTInt : m_dataType));
 	}
 

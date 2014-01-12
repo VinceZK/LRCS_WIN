@@ -78,7 +78,7 @@ void CBerkeleyView::OnBnClickedButton1()
 			tstring line = _T("1 ");
 			for(int i = 0; i < data.size(); ++i)
 			{
-				line.append(data[i]);
+				line.append(data[i].size() > 50 ? data[i].substr(0, 50) + _T("...") : data[i]);
 				line.append(_T(" "));
 			}
 
@@ -94,7 +94,7 @@ void CBerkeleyView::OnBnClickedButton1()
 			tstring line = csNum;
 			for(int i = 0; i < data.size(); ++i)
 			{
-				line.append(data[i]);
+				line.append(data[i].size() > 50 ? data[i].substr(0, 50) + _T("...") : data[i]);
 				line.append(_T(" "));
 			}
 

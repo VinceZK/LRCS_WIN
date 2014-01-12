@@ -224,7 +224,7 @@ bool DataSource::getPosOnPredValueSorted(ValPos* rhsvp_, ValPos* tempVP_){
 
 	if (!posOutTripleOnPred->isNull()) return false;
 	byte* page = NULL;
-	unsigned int position = 0;
+	int position = 0;
 	unsigned int minPos = 1;
 	unsigned int maxPos = getLastPosition();
 

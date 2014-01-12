@@ -8,10 +8,19 @@
 #include "DataSource.h"
 #include "PosOperator.h"
 
+#ifdef USE_GTEST
+#include <gtest\gtest.h>
+#endif
+
 using namespace std;
 
-class __declspec(dllexport) BlockPrinter
+class LRCSBasis_API BlockPrinter
 {
+public:	// Unit Test by gtest
+#ifdef USE_GTEST
+	FRIEND_TEST(TestBlockPrinter, TestMethod_PrintColumns);
+#endif
+
 public:
 	BlockPrinter(ostream *destStream, DataSource* dataSrc_[], int numCols_[], int numSrcs_);
 	BlockPrinter(DataSource* dataSrc_[], int numCols_[], int numSrcs_, char* fileName_);
@@ -38,5 +47,8 @@ protected:
 	Block** blks;
 	int totalCols;
 	ostream *destStream;
+
+private:
+	static int MULTITHREAD_WAY;
 };
 
