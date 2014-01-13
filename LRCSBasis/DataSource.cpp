@@ -11,7 +11,7 @@ DataSource::DataSource(AM* am_, bool isROS_, bool valSorted_, Decoder* decoder_)
 	init(am_, isROS_);
 	valSorted = valSorted_;
 	m_spDecoder.reset(decoder_);
-	currBlock = NULL;
+	m_pCurrBlock = NULL;
 
 }
 
@@ -116,23 +116,27 @@ Block* DataSource::getDecodedBlock(Decoder* decoder_) {
 // Gets the next value block from the operator 
 Block* DataSource::getNextValBlock(int colIndex_) {
 	//zklee: Each page is converted to a multiblock, no loop required anymore!
-	if (colIndex_ < 0)return NULL;
+	if (colIndex_ < 0)
+		return NULL;
 
 	byte* page = getRightPage();
-	if (page == NULL) return NULL;
+	if (page == NULL) 
+		return NULL;
+	
 	m_spDecoder->setBuffer(page);
 	if (posFilter != NULL){
 		unsigned int currStartPos = filterCursor->getCurrStartPosition();
 		skipToRightPosOnPage(currStartPos);
-		currBlock = (MultiBlock*)getDecodedBlock();
-		if (currBlock == NULL) return NULL;
-		currBlock->filterWithPos(filterCursor);
+		m_pCurrBlock = (MultiBlock*)getDecodedBlock();
+		if (m_pCurrBlock == NULL)
+			return NULL;
+		m_pCurrBlock->filterWithPos(filterCursor);
 	}
 	else{
-		currBlock = (MultiBlock*)getDecodedBlock();
+		m_pCurrBlock = (MultiBlock*)getDecodedBlock();
 	}
 
-	return currBlock;
+	return m_pCurrBlock;
 }
 
 byte* DataSource::getRightPage() {
@@ -193,7 +197,8 @@ MultiPosFilterBlock* DataSource::getPosOnPred(){
 	* The default here is string.
 	*/
 	matchedPredPos = new MultiPosFilterBlock();
-	if (m_pPred == NULL)matchedPredPos->setCompleteSet(true);
+	if (m_pPred == NULL)
+		matchedPredPos->setCompleteSet(true);
 	else{
 		predChanged = false;//Reset predChanged
 

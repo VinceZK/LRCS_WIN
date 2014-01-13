@@ -55,14 +55,14 @@ void FloatValPos::set(unsigned int pos_, byte* value_, unsigned short valSize) {
 	floatvalue = *(float*)value_;
 }
 
-void FloatValPos::set(unsigned int type_, unsigned int pos_, byte* value_) {
+void FloatValPos::set(eValueType type_, unsigned int pos_, byte* value_) {
 	//assert(type == ValPos::FLOATTYPE);
 	type = type_;
 	position = pos_;
 	floatvalue = *(float*)value_;
 }
 
-void FloatValPos::set(unsigned int type_, unsigned int pos_, byte* value_, unsigned short valSize_) {
+void FloatValPos::set(eValueType type_, unsigned int pos_, byte* value_, unsigned short valSize_) {
 	//assert(type == ValPos::FLOATTYPE);
 	type = type_;
 	position = pos_;

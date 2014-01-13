@@ -9,7 +9,7 @@ PosOperator::PosOperator(){
 	m_pTempPosBlock2 = NULL;
 	//m_pCacuPosBlock = NULL;
 	intermOp = '\0';
-	//prevOp = '\0';
+	prevOp = '\0';
 	addWhereOp('(');//Start   
 }
 
@@ -75,11 +75,12 @@ bool PosOperator::addPosBlock(MultiPosFilterBlock* posBlock){
 }
 
 MultiPosFilterBlock*  PosOperator::getPosFilter(){
-	if (m_pWhereOp == NULL)return NULL;
+	if (m_pWhereOp == NULL)
+		return NULL;
 	MultiPosFilterBlock* intermPosBlock = NULL;
 	m_pCurrWhereOp = m_pWhereOp;
 	char op;
-	char prevOp = '\0';
+	//char prevOp = '\0';
 	while (parseWhereOpreation(op, intermPosBlock, prevOp)){
 		if (op == '&' && intermPosBlock != NULL && intermPosBlock->hasNext()){
 			m_spCaculatedPosBlock.reset(doAndCaculate(m_spCaculatedPosBlock.get(), intermPosBlock));

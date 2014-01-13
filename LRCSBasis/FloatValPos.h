@@ -13,8 +13,8 @@ public:
 	virtual void set(byte* value_, unsigned short valSize_);
 	virtual void set(unsigned int pos_, byte* value_);
 	virtual void set(unsigned int pos_, byte* value_, unsigned short valSize_);
-	virtual void set(unsigned int type_, unsigned int pos_, byte* value_);
-	virtual void set(unsigned int type_, unsigned int pos_, byte* value_, unsigned short valSize_);
+	virtual void set(eValueType type_, unsigned int pos_, byte* value_);
+	virtual void set(eValueType type_, unsigned int pos_, byte* value_, unsigned short valSize_);
 	virtual double getDouble() { return (double)floatvalue; }
 	virtual void printVal(std::ostream* o);
 	virtual unsigned short getSize();

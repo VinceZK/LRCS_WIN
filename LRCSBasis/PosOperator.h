@@ -43,7 +43,7 @@ protected:
 	MultiPosFilterBlock* m_pTempPosBlock1;
 	MultiPosFilterBlock* m_pTempPosBlock2;
 	//MultiPosFilterBlock* m_pCacuPosBlock;
-	//char prevOp;
+	char prevOp;
 	char intermOp;
 	int Level;
 

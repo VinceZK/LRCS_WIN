@@ -55,14 +55,14 @@ void LongValPos::set(unsigned int pos_, byte* value_, unsigned short valSize_) {
 	longvalue = *(long long*)value_;
 }
 
-void LongValPos::set(unsigned int type_, unsigned int pos_, byte* value_) {
+void LongValPos::set(eValueType type_, unsigned int pos_, byte* value_) {
 	//assert(type == ValPos::LONGTYPE);
 	type = type_;
 	position = pos_;
 	longvalue = *(long long*)value_;
 }
 
-void LongValPos::set(unsigned int type_, unsigned int pos_, byte* value_, unsigned short valSize_) {
+void LongValPos::set(eValueType type_, unsigned int pos_, byte* value_, unsigned short valSize_) {
 	//assert(type == ValPos::LONGTYPE);
 	type = type_;
 	position = pos_;

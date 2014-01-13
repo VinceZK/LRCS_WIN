@@ -30,7 +30,7 @@ bool ProjMakerTst::run(char* arg1, char* arg2) {
 		string projName;
 		ProjMaker* projMaker = new ProjMaker();
 		while (i <= 5){
-			char* suf = new char[1];
+			char* suf = new char[10];
 			itoa(i, suf, 10);
 			projName = "StringTest0";
 			projName += *suf;
@@ -83,12 +83,12 @@ bool ProjMakerTst::run(char* arg1, char* arg2) {
 				<< "|" << projRecPtr->belongTable << "|" << projRecPtr->createTime
 				<< "|" << projRecPtr->alterTime << endl;
 			vector<COLUMN_REC>* columnsPtr = proj->getProjColumns();
-			for (int i = 0; i < columnsPtr->size(); i++)
-				cout << columnsPtr->at(i).columnID << "|" << columnsPtr->at(i).projectionName << "|" << columnsPtr->at(i).columnPosition
-				<< "|" << columnsPtr->at(i).columnName<< "|" << columnsPtr->at(i).dataType
-				<< "|" << columnsPtr->at(i).dataLength << "|" << columnsPtr->at(i).compressionType 
-				<< "|" << columnsPtr->at(i).sorted << "|" << columnsPtr->at(i).contiguous 
-				<< "|" << columnsPtr->at(i).createTime << endl;
+			for (unsigned int j = 0; j < columnsPtr->size(); j++)
+				cout << columnsPtr->at(j).columnID << "|" << columnsPtr->at(j).projectionName << "|" << columnsPtr->at(j).columnPosition
+				<< "|" << columnsPtr->at(j).columnName<< "|" << columnsPtr->at(j).dataType
+				<< "|" << columnsPtr->at(j).dataLength << "|" << columnsPtr->at(j).compressionType 
+				<< "|" << columnsPtr->at(j).sorted << "|" << columnsPtr->at(j).contiguous 
+				<< "|" << columnsPtr->at(j).createTime << endl;
 			i++;
 		}
 		delete projMaker;

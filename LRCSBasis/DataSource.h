@@ -52,7 +52,7 @@ protected:
 	AM* am;
 	Predicate* m_pPred;
 	auto_ptr<Decoder> m_spDecoder;
-	MultiBlock* currBlock;
+	MultiBlock* m_pCurrBlock;
 
 	bool posPrimaryIndex;
 	bool isROS;

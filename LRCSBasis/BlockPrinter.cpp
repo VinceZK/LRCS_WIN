@@ -84,18 +84,15 @@ void BlockPrinter::wrapperOfPrintColumns(bool bSkipOutput, bool bOutStream)
 	{
 		// Here uses the multi-thread to calc the result.
 		HANDLE* pThreadHandles = new HANDLE[numSrcs];
-
 		ParallelHelper::tParams* pParams = new ParallelHelper::tParams[numSrcs];
+
 		for (size_t i = 0; i < numSrcs; i++)
 		{
 			pParams[i].pDataSrc = dataSrc[i];
 			pParams[i].pResult = NULL;
-		}
-
-		for (size_t i = 0; i < numSrcs; i++)
-		{
 			pThreadHandles[i] = (HANDLE)_beginthreadex(NULL, 0, &ParallelHelper::threadFunc_DataSrc, &pParams[i], 0, NULL);
 		}
+
 		DWORD dwRet = ::WaitForMultipleObjects(numSrcs, pThreadHandles, true, 5000);
 
 		for (size_t i = 0; i < numSrcs; i++)
@@ -119,10 +116,6 @@ void BlockPrinter::wrapperOfPrintColumns(bool bSkipOutput, bool bOutStream)
 #pragma omp parallel for num_threads(ParallelHelper::GetThreadNumber(numSrcs))
 		for (int i = 0; i < numSrcs; i++)
 		{
-	//#ifdef DEBUG
-	//		int threadId = omp_get_thread_num();
-	//		cout << "thread ID: " << threadId << endl;
-	//#endif
 			aryMPFB[i] = dataSrc[i]->getPosOnPred();
 		}
 

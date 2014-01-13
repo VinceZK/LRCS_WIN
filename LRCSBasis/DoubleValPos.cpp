@@ -55,14 +55,14 @@ void DoubleValPos::set(unsigned int pos_, byte* value_, unsigned short valSize_)
 	doublevalue = *(double*)value_;
 }
 
-void DoubleValPos::set(unsigned int type_, unsigned int pos_, byte* value_) {
+void DoubleValPos::set(eValueType type_, unsigned int pos_, byte* value_) {
 	//assert(type == ValPos::DOUBLETYPE);
 	type = type_;
 	position = pos_;
 	doublevalue = *(double*)value_;
 }
 
-void DoubleValPos::set(unsigned int type_, unsigned int pos_, byte* value_, unsigned short valSize_) {
+void DoubleValPos::set(eValueType type_, unsigned int pos_, byte* value_, unsigned short valSize_) {
 	//assert(type == ValPos::DOUBLETYPE);
 	type = type_;
 	position = pos_;
