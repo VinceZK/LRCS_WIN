@@ -4,7 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include "Log.h"
+#include "LRCS_ENV.h"
 #include <assert.h>
 #include <string>
 #include <map>
@@ -15,6 +15,8 @@
 #include "Query4S.h"
 #include "ExceptionTst.h"
 #include "ProjMakerTst.h"
+#include "LRCSEnvTst.h"
+#include "LogTst.h"
 
 using namespace std;
 
@@ -24,7 +26,11 @@ void initAllTestSuites(map<string, UnitTest*> &testSuites);
 int main(int argc, CHAR* argv[])
 {
 	using namespace std;
-	Log::logInit();
+	if (!LRCS_ENV::initLRCS()){
+		cerr << "LRCS enviroment initialization failed!" << endl;
+		return 0;
+	}
+		
 	string testName;
 	bool useOwn = true;
 	char* arg1 = NULL;
@@ -71,9 +77,11 @@ int main(int argc, CHAR* argv[])
 	}
 	//cout << "args: " << arg1 << " " <<  arg2 << endl;
 
+	cout << "------------------------Begin Test-----------------------------" << endl;
 	runTest(testName, arg1, arg2);
-
-	Log::logDestroy();
+	cout << "------------------End Test & Recall Resource-------------------" << endl;
+	LRCS_ENV::closeLRCS();
+	cout << "----------------------Resource Recalled------------------------" << endl;
 	return 0;
 }
 
@@ -82,7 +90,7 @@ void runTest(string testName, char* arg1, char* arg2){
 	map<string, UnitTest*> testSuites;
 	initAllTestSuites(testSuites);
 
-	cout << testName << endl;
+	cout << "TEST SUIT: " << testName << " Loaded!" << endl;
 	if (testSuites[testName] != NULL)
 		success &= testSuites[testName]->run(arg1, arg2);
 
@@ -102,4 +110,6 @@ void initAllTestSuites(map<string, UnitTest*> &testSuites){
 	testSuites["Query4S"] = new Query4S();
 	testSuites["ExceptionTst"] = new ExceptionTst();
 	testSuites["ProjMakerTst"] = new ProjMakerTst();	
+	testSuites["LRCSEnvTst"] = new LRCSEnvTst();
+	testSuites["LogTst"] = new LogTst();	
 }

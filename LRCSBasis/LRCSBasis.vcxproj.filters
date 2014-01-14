@@ -360,6 +360,12 @@
     <ClInclude Include="StringColumnCreator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LRCS_ENV.h">
+      <Filter>Header Files\CoreObjects\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="TypeConvert.h">
+      <Filter>Header Files\CoreObjects\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -586,6 +592,12 @@
     </ClCompile>
     <ClCompile Include="Projection.cpp">
       <Filter>Source Files\CoreObjects\Projection</Filter>
+    </ClCompile>
+    <ClCompile Include="LRCS_ENV.cpp">
+      <Filter>Source Files\CoreObjects\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="TypeConvert.cpp">
+      <Filter>Source Files\CoreObjects\Util</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

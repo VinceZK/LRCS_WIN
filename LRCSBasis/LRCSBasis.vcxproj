@@ -121,6 +121,7 @@
     <ClInclude Include="IntWriter.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="LongValPos.h" />
+    <ClInclude Include="LRCS_ENV.h" />
     <ClInclude Include="LZDataSource.h" />
     <ClInclude Include="LZDecoder.h" />
     <ClInclude Include="LZEncoder.h" />
@@ -161,6 +162,7 @@
     <ClInclude Include="SysDbEnv.h" />
     <ClInclude Include="SysTime.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TypeConvert.h" />
     <ClInclude Include="UncompressedDecoder.h" />
     <ClInclude Include="UncompressedEncoder.h" />
     <ClInclude Include="UnexpectedException.h" />
@@ -305,6 +307,10 @@
     <ClCompile Include="LRCSBasis.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="LRCS_ENV.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="LZDataSource.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -447,6 +453,10 @@
     </ClCompile>
     <ClCompile Include="SysTime.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="TypeConvert.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="UncompressedDecoder.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>

@@ -58,7 +58,7 @@ bool Query2S::run(char* arg1, char* arg2) {
 		PagePlacer* pagePlacer = new PagePlacer(lzEncoder,
 			lzDecoder,
 			2,
-			false);
+			true);
 		pagePlacer->placeColumn("StringTest02.ID", false, true,0);
 		delete pagePlacer;
 		delete ce;
@@ -81,7 +81,7 @@ bool Query2S::run(char* arg1, char* arg2) {
 		pagePlacer = new PagePlacer(lzEncoder,
 			lzDecoder,
 			2,
-			false);
+			true);
 		pagePlacer->placeColumn("StringTest02.DESC", false, true,0);
 		delete pagePlacer;
 		delete ce;
@@ -91,7 +91,7 @@ bool Query2S::run(char* arg1, char* arg2) {
 		delete lzDecoder;
 
 		stopWatch.stop();
-		system("move StringTest02* " RUNTIME_DATA);	
+		//system("move StringTest02* " RUNTIME_DATA);	
 	}
 
 	Log::writeToLog("Query2S", 10, "Opening Column1...");
@@ -106,7 +106,7 @@ bool Query2S::run(char* arg1, char* arg2) {
 	LZDataSource* ds2 = new LZDataSource(am2, true, true, (new StringDecoder(true)));
 
 	ds1->setPredicate(pred1);
-	//ds2->setPredicate(pred2);
+	ds2->setPredicate(pred2);
 
 	ValPos* rhs1 = new StringValPos(10);
 	char* RHSVal1 = "abc0010001";
@@ -116,7 +116,7 @@ bool Query2S::run(char* arg1, char* arg2) {
 	ValPos* rhs2 = new StringValPos(11);
 	char* RHSVal2 = "LRCS0000051";
 	rhs2->set((byte*)RHSVal2);
-	//ds2->changeRHSBinding(rhs2);
+	ds2->changeRHSBinding(rhs2);
 
 	DataSource* srcs[2] = { ds1, ds2 };
 	int numCols[2] = { 1, 1 };

@@ -38,7 +38,7 @@ bool Query1S::run(char* arg1, char* arg2) {
 		PagePlacer* pagePlacer = new PagePlacer(encoder,
 			decoder,
 			2,
-			false);
+			true);
 		pagePlacer->placeColumn("StringTest01.ID", false, true,0);
 		delete pagePlacer;
 		delete ce;
@@ -57,14 +57,14 @@ bool Query1S::run(char* arg1, char* arg2) {
 		pagePlacer = new PagePlacer(encoder,
 			decoder,
 			2,
-			false);
+			true);
 		pagePlacer->placeColumn("StringTest01.DESC", false, false, 0);
 		delete pagePlacer;
 		delete ce;
 		delete encoder;
 		delete decoder;
 		stopWatch.stop();
-		system("move StringTest01* " RUNTIME_DATA);
+		//system("move StringTest01* " RUNTIME_DATA);
 	}
 
 	Log::writeToLog("Query1S", 10, "Opening Column1...");
@@ -72,18 +72,18 @@ bool Query1S::run(char* arg1, char* arg2) {
 	ROSAM* am1 = new ROSAM("StringTest01.ID", 2, sizeof(int), 10, ValPos::INTTYPE, ValPos::STRINGTYPE);
 	Log::writeToLog("Query1S", 10, "Opening Column2...");
 	ROSAM* am2 = new ROSAM("StringTest01.DESC", 2, sizeof(int), 11, ValPos::INTTYPE, ValPos::STRINGTYPE);
-	Predicate* pred1 = new Predicate(Predicate::OP_LESS_THAN_OR_EQUAL);
+	Predicate* pred1 = new Predicate(Predicate::OP_GREATER_THAN_OR_EQUAL);
 	Predicate* pred2 = new Predicate(Predicate::OP_LESS_THAN);
 	StringDataSource* ds1 = new StringDataSource(am1, true, true);
 	StringDataSource* ds2 = new StringDataSource(am2, false, true);
 
-	//ds1->setPredicate(pred1);
+	ds1->setPredicate(pred1);
 	//ds2->setPredicate(pred2);
 
 	ValPos* rhs1 = new StringValPos(10);
-	char* RHSVal1 = "abcde00020";
+	char* RHSVal1 = "abcde99990";
 	rhs1->set((byte*)RHSVal1);
-	//ds1->changeRHSBinding(rhs1);
+	ds1->changeRHSBinding(rhs1);
 
 	ValPos* rhs2 = new StringValPos(11);
 	char* RHSVal2 = "Cstore00010";
