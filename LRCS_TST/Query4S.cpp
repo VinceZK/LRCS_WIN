@@ -88,7 +88,7 @@ bool Query4S::run(char* arg1, char* arg2) {
 		delete lzEncoder;
 		delete lzDecoder;
 		stopWatch.stop();
-		system("move StringTest04* " RUNTIME_DATA);
+		//system("move StringTest04* " RUNTIME_DATA);
 	}
 
 	Log::writeToLog("Query4S", 10, "Opening Column1...");
@@ -106,7 +106,7 @@ bool Query4S::run(char* arg1, char* arg2) {
 	char* RHSVal1 = "abc0000040";
 	rhs1->set((byte*)RHSVal1);
 	ValPos* rhs2 = new StringValPos(4);
-	char* RHSVal2 = "2001";
+	char* RHSVal2 = "2010";
 	rhs2->set((byte*)RHSVal2);
 
 	//ds1->setPredicate(pred1);

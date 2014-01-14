@@ -91,7 +91,7 @@ bool Query3S::run(char* arg1, char* arg2) {
 		delete lzEncoder;
 		delete lzDecoder;
 		stopWatch.stop();
-		system("move StringTest03* " RUNTIME_DATA);
+		//system("move StringTest03* " RUNTIME_DATA);
 	}
 
 	Log::writeToLog("Query3S", 10, "Opening Column1...");

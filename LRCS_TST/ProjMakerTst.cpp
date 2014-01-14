@@ -2,7 +2,6 @@
 #include "Exception.h"
 #include "ProjMaker.h"
 #include "ValPos.h"
-#include "SysDbEnv.h"
 #include <stdlib.h>
 
 using namespace std;
@@ -25,7 +24,6 @@ bool ProjMakerTst::run(char* arg1, char* arg2) {
 	char projNameC[MAX_NAME_LENGTH];
 	
 	try{
-		SysDbEnv::initDbEnv();
 		int i = 1;
 		string projName;
 		ProjMaker* projMaker = new ProjMaker();
@@ -92,7 +90,6 @@ bool ProjMakerTst::run(char* arg1, char* arg2) {
 			i++;
 		}
 		delete projMaker;
-		SysDbEnv::closeDbEnv();
 	}
 	catch (Exception* e){
 		cerr << "ProjMakerTst: Error happened" << endl;

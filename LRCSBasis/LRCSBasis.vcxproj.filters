@@ -362,6 +362,11 @@
     </ClInclude>
     <ClInclude Include="ParallelHelper.h">
       <Filter>Header Files</Filter>
+    <ClInclude Include="LRCS_ENV.h">
+      <Filter>Header Files\CoreObjects\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="TypeConvert.h">
+      <Filter>Header Files\CoreObjects\Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -595,6 +600,11 @@
     </ClCompile>
     <ClCompile Include="..\UnitTest_Src\TestBlockPrinter.cpp">
       <Filter>Source Files</Filter>
+    <ClCompile Include="LRCS_ENV.cpp">
+      <Filter>Source Files\CoreObjects\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="TypeConvert.cpp">
+      <Filter>Source Files\CoreObjects\Util</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

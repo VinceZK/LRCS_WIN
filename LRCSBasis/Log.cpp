@@ -1,12 +1,23 @@
 #include "Log.h"
+#include "TypeConvert.h"
+#include "LRCS_ENV.h"
+#include "SysTime.h"
+#include "StringUtil.h"
+#include "UnexpectedException.h"
 
-// Master priority threshold
-#define PRIORITY_THRESHOLD 0
-#define LOG_TO_FILE 10
-#define LOG_FILENAME "CStoreQPTest.log"
+
+
+using namespace std;
 
 int Log::threshold;
+int Log::logSize;
 ostream* Log::logStream;
+string Log::logFileName;
+bool Log::log_2_file;
+bool Log::no_log;
+map<int, string>* Log::logSlot;
+CRITICAL_SECTION Log::csLock;
+char* Log::logstr;
 
 Log::Log()
 {}
@@ -14,10 +25,25 @@ Log::~Log()
 {}
 
 void Log::logInit() {
-	using namespace std;
-	if (LOG_TO_FILE) {
-		logStream = new ofstream();
-		((ofstream*)logStream)->open(LOG_FILENAME);
+	log_2_file = TypeConvert::StringToBoolean(LRCS_ENV::getGlobalConf("LOG_TO_FILE"));
+	logFileName = LRCS_ENV::getGlobalConf("LOG_FILENAME");
+	if (logFileName.empty())logFileName = "LRCSRuntime.log";
+	threshold = TypeConvert::StringToInt(LRCS_ENV::getGlobalConf("LOG_PRIORITY_THRESHOLD"));
+	logSize = TypeConvert::StringToInt(LRCS_ENV::getGlobalConf("LOG_SIZE")) * 1024 * 1024;
+	no_log = TypeConvert::StringToBoolean(LRCS_ENV::getGlobalConf("NO_LOG"));
+
+	if (no_log)return;
+
+	initLogSlot();
+	logstr = new char[MAXLINSIZE + 1];
+
+	InitializeCriticalSection(&csLock);
+
+	logStream = NULL;
+
+	if (log_2_file) {
+		if(!openNewLogFile())
+			throw new UnexpectedException("Log.cpp: Open log file failed!");
 	}
 	else {
 		logStream = &cout;
@@ -25,172 +51,127 @@ void Log::logInit() {
 }
 
 void Log::logDestroy() {
-	if (LOG_TO_FILE) {
-		((ofstream*)logStream)->close();
+	if (log_2_file && logStream != NULL) {
 		delete logStream;
+		delete logSlot;
 	}
+	delete[] logstr;
 }
 
 bool Log::writeToLog(char* src_, int priority_, string msg_) {
-	writeToLog(src_, priority_, (char*)msg_.c_str());
-	return true;
+	return writeToLog(src_, priority_, (char*)msg_.c_str());
 }
-bool Log::writeToLog(char* src_, int priority_, char* msg_) {
-	using namespace std;
-	if (priority_ >= PRIORITY_THRESHOLD) {
-		if (allowedSrc(src_, priority_))
-			cout << "LOG: " << src_ << " MSG: " << msg_ << endl;
-	}
+bool Log::writeToLog(char* src_, int priority_, char* msg_, ...) {
+	if (priority_ >= threshold && !no_log){
+		va_list argp;
+		if (msg_ == NULL || msg_[0] == 0)return false;
+		string timeStamp = SysTime::getCurrTime();
+
+		EnterCriticalSection(&csLock);
+		*logStream << timeStamp << ":" << src_ << " MSG: ";
+		va_start(argp, msg_);
+		_vsnprintf(logstr, MAXLINSIZE, msg_, argp);
+		*logStream << logstr;
+		va_end(argp);
+		*logStream << endl;
+		if (logStream->tellp() > logSize){
+			openNewLogFile();
+		}
+		else{
+			((ofstream*)logStream)->flush();
+		}
+		LeaveCriticalSection(&csLock);
+		//writeLogStream(src_, msg_);
+	}	
 	return true;
 }
 
 bool Log::writeToLog(char* src_, int priority_, char* msg_, int val_) {
-	using namespace std;
-	if (priority_ >= PRIORITY_THRESHOLD) {
-		if (allowedSrc(src_, priority_))
-			cout << "LOG: " << src_ << " MSG: " << msg_ << "=" << val_ << endl;
+	/*if (priority_ >= threshold && !no_log) {
+		if (msg_ == NULL || msg_[0] == 0)return false;
+		char* msgBuff = new char[512];
+		sprintf(msgBuff, "%s%d", msg_, val_);
+		writeLogStream(src_, msgBuff);
+		delete[] msgBuff;
 	}
-	return true;
+			
+	return true;*/
+	return writeToLog(src_, priority_, "%s%d", msg_, val_);
 }
 
-ostream* Log::getLogStream(char* src_, int priority_) {
-	if (priority_ >= PRIORITY_THRESHOLD) {
-		if (allowedSrc(src_, priority_))
-			return logStream;
-		return NULL;
+void Log::writeLogStream(char* src_, char* msg_) {
+	string timeStamp = SysTime::getCurrTime();
+	EnterCriticalSection(&csLock);
+	*logStream << timeStamp << ":" << src_ << " MSG: " << msg_ << endl;	
+	if (logStream->tellp() > logSize){
+		openNewLogFile();
 	}
-	else {
-		return NULL;
+	else{
+		((ofstream*)logStream)->flush();
 	}
+	LeaveCriticalSection(&csLock);
 }
 
-bool Log::allowedSrc(char* src_, int priority_) {
-	using namespace std;
-#ifdef CSTORE_NOLOG
-	return false;
-#endif
-	if (strcmp(src_, "Log") == 0) return true;
-	else if ((strcmp(src_, "AM") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "DataSource") == 0) && (priority_ >= 1)) return false;
+int Log::getCurrLogIndex(){
+	map<int, string>::iterator m_it;
+	for (m_it = logSlot->begin(); m_it != logSlot->end(); m_it++){
+		if (strcmp(m_it->second.c_str(), "0") == 0)
+			return m_it->first;
+	}
+	/*If all the slots are used,reset all the slot to initial*/
+	for (m_it = logSlot->begin(); m_it != logSlot->end(); m_it++)
+		m_it->second = "0";
+	return 1;
+}
 
-	else if ((strcmp(src_, "BitWriter") == 0) && (priority_ >= 1)) return false;
-	else if ((strcmp(src_, "BitReader") == 0) && (priority_ >= 1)) return false;
+void Log::setCurrLogIndex(int slot_){
+	logSlot->at(slot_) = "1"; //Should always return the right value!!
+	//logSlot[slot_] = "1";
+	ofstream outstream;
+	map<int, string>::iterator m_it;
+	outstream.open(LOG_SLOT);
+	for (m_it = logSlot->begin(); m_it != logSlot->end(); m_it++)
+		outstream << m_it->first << SEPARATOR << m_it->second << endl;
+	outstream.close();
+}
 
-	else if ((strcmp(src_, "RLEEncoder") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "RLEDecoder") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "RLEWriter") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "RLEDataSource") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "RLEExtractLoadAndAccess") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "RLEDecoderII") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "RLEEncoderII") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "PosRLEWriter") == 0) && (priority_ >= 0)) return false;
+bool Log::openNewLogFile(){
+	if (logStream != NULL){
+		((ofstream*)logStream)->close();
+		char* buff = new char[256];
+		int currLogSlot = getCurrLogIndex();
+		sprintf(buff, "%s.%d", logFileName.c_str(), currLogSlot);
+		string archiveLogName = buff;
+		delete[] buff;
+		if (rename(logFileName.c_str(), archiveLogName.c_str())){
+			remove(archiveLogName.c_str());
+			rename(logFileName.c_str(), archiveLogName.c_str());
+		}
+		setCurrLogIndex(currLogSlot);
+	}
+	else{
+		logStream = new ofstream();
+	}
+	((ofstream*)logStream)->open(logFileName, ios::out | ios::app);
+	return ((ofstream*)logStream)->is_open();
+}
 
-	else if ((strcmp(src_, "IntEncoder") == 0) && (priority_ >= 1)) return false;
-	else if ((strcmp(src_, "IntDecoder") == 0) && (priority_ >= 1)) return false;
-	else if ((strcmp(src_, "StringEncoder") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "StringDecoder") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "IntDataSource") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "StringDataSource") == 0) && (priority_ >= 0)) return false;
-
-	else if ((strcmp(src_, "DeltaEncoder") == 0) && (priority_ >= 0)) 		return false;
-
-	else if ((strcmp(src_, "DeltaPosDataSource") == 0) && (priority_ >= 2)) return false;
-	else if ((strcmp(src_, "DeltaPosEncoder") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "DeltaPosWriter") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "DeltaPosBlock") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "DeltaPosValue") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "PagePlacer") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "NLJoin") == 0) && (priority_ >= 0)) return false;
-
-	else if ((strcmp(src_, "LZEncoder") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "LZDecoder") == 0) && (priority_ >= 2)) return false;
-
-	else if ((strcmp(src_, "NSEncoder") == 0) && (priority_ >= 1)) return false;
-	else if ((strcmp(src_, "NSDecoder") == 0) && (priority_ >= 1)) return false;
-
-	else if ((strcmp(src_, "DictWriter") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "DictByteWriter") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "DictDataSource") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "BitBlock") == 0) && (priority_ >= 0)) return false;
-
-	else if ((strcmp(src_, "Aggregator") == 0) && (priority_ >= 1)) return false;
-	else if ((strcmp(src_, "AggProcessor") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "Query1") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "Query2") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "Query3") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "Query4") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "Query5") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "Query6") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "Query7") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "Query3WSRS") == 0) && (priority_ >= 0)) return false;
-
-	else if ((strcmp(src_, "Query1U") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "Query2U") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "Query3U") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "Query4U") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "Query5U") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "Query6U") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "Query7U") == 0) && (priority_ >= 0)) return false;
-
-	else if ((strcmp(src_, "Query1S") == 0) && (priority_ >= 0)) return true;
-	else if ((strcmp(src_, "Query2S") == 0) && (priority_ >= 0)) return true;
-	else if ((strcmp(src_, "Query3S") == 0) && (priority_ >= 0)) return true;
-	else if ((strcmp(src_, "Query4S") == 0) && (priority_ >= 0)) return true;
-	else if ((strcmp(src_, "Index1S") == 0) && (priority_ >= 0)) return true;
-
-	else if ((strcmp(src_, "HashTable") == 0) && (priority_ >= 0)) return false;
-
-	else if ((strcmp(src_, "Plans") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "Plan") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "SelectPlan") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "CommitPlan") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "DeletePlan") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "InsertPlan") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "Node") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "BNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "MNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "SNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "UNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "SelectNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "InsertNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "DeleteProjectionNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "CommitNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "UAggAvgNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "UAggCountNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "UAggMaxNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "UAggMinNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "UAggNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "UAggSumNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "UCopyNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "UDeleteProjectionNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "UInsertColumnNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "UNegationNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "UProjectNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "BAggAvgNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "BAggCountNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "BAggMaxNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "BAggMinNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "BUAggNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "BAggSumNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "BConjunctionNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "BDisjunctionNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "BJoinNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "BProjectNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "MConcatNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "MDeleteProjectionNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "MInsertProjectionNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "MResultNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "SProjectionUnionNode") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "JoinOutputs") == 0) && (priority_ >= 0)) return false;
-
-	else if ((strcmp(src_, "Parser") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "PObject") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "BExpression") == 0) && (priority_ >= 0)) return false;
-	else if ((strcmp(src_, "Expression") == 0) && (priority_ >= 0)) return false;
-	//else if ((strcmp(src_, "")==0)		&& (priority_>=0)) return false;
-	//else if ((strcmp(src_, "")==0)		&& (priority_>=0)) return false;
-
-
-	else return false;
-
+void Log::initLogSlot(){
+	logSlot = new map<int, string>;
+	ifstream* infile = new ifstream(LOG_SLOT);
+	if (!infile->is_open()){
+		delete infile;
+		return;
+	}
+	string line;
+	string whitespace = "\t ";
+	while (getline((*infile), line)){
+		line = StringUtil::ltrim(line, whitespace);
+		string slotName = StringUtil::splitDelimitedSubstring(SEPARATOR, line, 1);
+		string slotStatus = StringUtil::splitDelimitedSubstring(SEPARATOR, line, 2);
+		int slot = TypeConvert::StringToInt(slotName);
+		//logSlot[slot] = slotStatus;
+		logSlot->insert(map<int, string>::value_type(slot, slotStatus));
+	}
+	delete infile;
 }

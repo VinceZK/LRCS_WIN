@@ -94,6 +94,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ExceptionTst.h" />
+    <ClInclude Include="LogTst.h" />
+    <ClInclude Include="LRCSEnvTst.h" />
     <ClInclude Include="ProjMakerTst.h" />
     <ClInclude Include="Query1S.h" />
     <ClInclude Include="Query2S.h" />
@@ -107,6 +109,8 @@
     <ClCompile Include="ExceptionTst.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="LogTst.cpp" />
+    <ClCompile Include="LRCSEnvTst.cpp" />
     <ClCompile Include="LRCS_TST.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>

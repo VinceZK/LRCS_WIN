@@ -9,7 +9,7 @@ using namespace std;
 /*Bitmap Encoder
 *encoder positions into bitmaps.
 *Only used for positions not values.
-*/
+*/  
 class __declspec(dllexport) BitmapEncoder :
 	public PosEncoder
 {
@@ -22,19 +22,19 @@ public:
 	virtual void addValPos(ValPos* vp_);
 	virtual void purgeMap2Queue();
 protected:
-	map<string, byte*> pageMap;
-	map<string, PosBlock*> blockMap;
+	map<string, byte*>* pageMap;
+	map<string, PosBlock*>* blockMap;
 
 	struct ele{
 		byte* value;
 		byte* page;
 	};
 
-	queue<ele> outPutQ;
+	queue<ele>* outPutQ;
 	int bufferSizeInBytes;
 	short valSize;
 
-	void initANewPage(string valueStr);
+	byte* initANewPage(string valueStr);
 	void initANewBlock(string valueSt, ValPos* vp_);
 	bool appendBlocktoPage(byte* page_, PosBlock* posBlock_);
 	void putPage2Queue(byte* page_, string valueStr_);
