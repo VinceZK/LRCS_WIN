@@ -19,6 +19,8 @@ class LRCSBasis_API BlockPrinter
 public:	// Unit Test by gtest
 #ifdef USE_GTEST
 	FRIEND_TEST(TestBlockPrinter, TestMethod_PrintColumns);
+
+	std::vector<std::string>	m_aryQueryResult;
 #endif
 
 public:

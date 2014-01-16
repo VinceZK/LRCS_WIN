@@ -100,7 +100,12 @@ void PageWriter::initDB(string c_name, bool dupsort) {
 		catch (DbException &dbe){
 			
 		}*/
+		try{
 		ret = _db_local[which]->open(NULL, dbname, NULL, DB_BTREE, DB_CREATE, 0664);
+		}
+		catch (DbException &dbe){
+			std::string msg = dbe.what();
+		}
 		delete[] dbname;
 		if (ret < 0) {
 			cout << "Failed to open table i = " << which << endl;

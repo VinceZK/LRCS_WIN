@@ -111,6 +111,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>USE_GTEST;WIN32;_DEBUG;_WINDOWS;_USRDLL;LRCSBASIS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <OpenMPSupport>true</OpenMPSupport>
+      <PreprocessToFile>false</PreprocessToFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

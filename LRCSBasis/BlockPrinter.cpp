@@ -210,11 +210,39 @@ bool BlockPrinter::printEntryForColumn(DataSource* dataSrc_, int currCol, int cu
 			pair->printVal(this->destStream);
 			if (isLast)
 				(*destStream) << endl;
-			//*destStream << endl;
 			else
 				(*destStream) << ",";
 		}
 	}
+#ifdef USE_GTEST
+	else
+	{
+		char* szBuf = new char[pair->getSize() + 1];
+		memset(szBuf, 0, pair->getSize() + 1);
+		switch (pair->type)
+		{
+		case ValPos::INTTYPE:
+			sprintf(szBuf, "%d", *((int*)pair->value));
+			break;
+		case ValPos::DOUBLETYPE:
+			sprintf(szBuf, "%f", *((double*)pair->value));
+			break;
+		case ValPos::FLOATTYPE:
+			sprintf(szBuf, "%f", *((float*)pair->value));
+			break;
+		case ValPos::LONGTYPE:
+			sprintf(szBuf, "%d", *((long*)pair->value));
+			break;
+		case ValPos::STRINGTYPE:
+			strncpy(szBuf, (char*)pair->value, pair->getSize());
+		}
+
+		std::string value = szBuf;
+		m_aryQueryResult.push_back(value);
+
+		delete[] szBuf;
+	}
+#endif 
 
 	//BUG FIX: hasNext might be false now, but true next time this is called since the data blks[currTotalCol] is pointing to can be updated. However, we want to force getNextValBlock to be called to update the pointer, so put NULL in blks[currTotalCol] if !hasNext
 
