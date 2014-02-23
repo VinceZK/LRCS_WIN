@@ -150,6 +150,7 @@ Projection* ProjMaker::getProjection(char* projName_){
 		iter->close();
 		break;
 	case DB_NOTFOUND:
+		delete proj;
 		return NULL;
 	default:
 		throw new AccessException("ProjMaker : getProjection failed!");

@@ -1,7 +1,7 @@
 #include "Projection.h"
 #include "BDBEnv.h"
 
-Projection::Projection(char* projName_)
+Projection::Projection(const char* projName_)
 {
 	projName = projName_;
 }
