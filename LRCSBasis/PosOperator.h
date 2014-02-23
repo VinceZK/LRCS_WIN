@@ -1,7 +1,15 @@
 #pragma once
+
+#ifdef LRCSBASIS_EXPORTS
+#define LRCSBasis_API __declspec(dllexport)
+#else
+#define LRCSBasis_API __declspec(dllimport)
+#endif
+
 #include "MultiPosFilterBlock.h"
 #include "assert.h"
 #include <stdlib.h>
+#include <memory>
 
 struct  whereOp
 {
@@ -10,7 +18,7 @@ struct  whereOp
 	whereOp* nextOp;
 };
 
-class PosOperator
+class LRCSBasis_API PosOperator
 {
 public:
 	PosOperator();
@@ -29,18 +37,18 @@ public:
 
 protected:
 
-	whereOp* WhereOp;
-	whereOp* currWhereOp;
-	MultiPosFilterBlock* caculatedPosBlock;
-	MultiPosFilterBlock* tempPosBlock1;
-	MultiPosFilterBlock* tempPosBlock2;
-	MultiPosFilterBlock* cacuPosBlock;
+	whereOp* m_pWhereOp;
+	whereOp* m_pCurrWhereOp;
+	auto_ptr<MultiPosFilterBlock> m_spCaculatedPosBlock;
+	MultiPosFilterBlock* m_pTempPosBlock1;
+	MultiPosFilterBlock* m_pTempPosBlock2;
+	//MultiPosFilterBlock* m_pCacuPosBlock;
 	char prevOp;
 	char intermOp;
 	int Level;
 
-	virtual bool parseWhereOpreation(char& op_, MultiPosFilterBlock* &intermPosBlock_);
-	virtual MultiPosFilterBlock* doAndCaculate(MultiPosFilterBlock* posBlock1_, MultiPosFilterBlock* posBlock2_);
-	virtual MultiPosFilterBlock* doOrCaculate(MultiPosFilterBlock* posBlock1_, MultiPosFilterBlock* posBlock2_);
+	virtual bool parseWhereOpreation(char& op_, MultiPosFilterBlock* &intermPosBlock_, char& prevOp);
+	virtual MultiPosFilterBlock* doAndCaculate(MultiPosFilterBlock* posBlock1_, MultiPosFilterBlock* posBlock2_) const;
+	virtual MultiPosFilterBlock* doOrCaculate(MultiPosFilterBlock* posBlock1_, MultiPosFilterBlock* posBlock2_) const;
 };
 

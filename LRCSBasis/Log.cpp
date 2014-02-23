@@ -14,7 +14,7 @@ int Log::logSize;
 ostream* Log::logStream;
 string Log::logFileName;
 bool Log::log_2_file;
-bool Log::no_log;
+bool Log::no_log = true;
 map<int, string>* Log::logSlot;
 CRITICAL_SECTION Log::csLock;
 char* Log::logstr;

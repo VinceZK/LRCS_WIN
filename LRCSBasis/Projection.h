@@ -27,7 +27,7 @@ using namespace std;
 class __declspec(dllexport) Projection
 {
 public:
-	Projection(char* projName_);
+	Projection(const char* projName_);
 	~Projection();
 	PROJECTION_REC* getProjectionRec();
 	void setProjectionRec(PROJECTION_REC* projection_);
@@ -38,7 +38,7 @@ public:
 	void addColumns(vector<COLUMN_REC>* columns_);
 	void removeColumns(vector<COLUMN_REC>* columns_);
 private:
-	char* projName;
+	const char* projName;
 	PROJECTION_REC projRec;
 	vector<COLUMN_REC> colRec;
 };

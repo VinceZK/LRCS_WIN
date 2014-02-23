@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "LRCS_ENV.h"
 #include "Constants.h"
 #include "Exception.h"

@@ -209,7 +209,25 @@ const void* ROSAM::skipToPagePrimary(char* key)
 	pkey.set_ulen(primkeysize);
 
 
-	ret = _iter_arr[PRIMARY]->get(&pkey, &data, DB_SET_RANGE);
+	//try
+	//{
+		ret = _iter_arr[PRIMARY]->get(&pkey, &data, DB_SET_RANGE);
+	//}
+	//catch (DbException e)
+	//{
+	//	std::string errMsg = e.what();
+	//}
+	//catch (Exception e)
+	//{
+	//	std::string errMsg = e.msg;
+	//}
+	//catch (exception e)
+	//{
+	//	std::string errMsg = e.what();
+	//}
+	//catch (...)
+	//{
+	//}
 
 	delete[] key_buf;
 

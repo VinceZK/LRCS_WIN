@@ -55,14 +55,14 @@ void IntValPos::set(unsigned int pos_, byte* value_, unsigned short valSize) {
 	intvalue = *(int*)value_;
 }
 
-void IntValPos::set(unsigned int type_, unsigned int pos_, byte* value_) {
+void IntValPos::set(eValueType type_, unsigned int pos_, byte* value_) {
 	//assert(type == ValPos::INTTYPE);
 	type = type_;
 	position = pos_;
 	intvalue = *(int*)value_;
 }
 
-void IntValPos::set(unsigned int type_, unsigned int pos_, byte* value_, unsigned short valSize_) {
+void IntValPos::set(eValueType type_, unsigned int pos_, byte* value_, unsigned short valSize_) {
 	//assert(type == ValPos::INTTYPE);
 	type = type_;
 	position = pos_;

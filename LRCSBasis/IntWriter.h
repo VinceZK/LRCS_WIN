@@ -1,8 +1,15 @@
 #pragma once
+
+#ifdef LRCSBASIS_EXPORTS
+#define LRCSBasis_API __declspec(dllexport)
+#else
+#define LRCSBasis_API __declspec(dllimport)
+#endif
+
 #include "Constants.h"
 #include "Util.h"
 
-class IntWriter
+class LRCSBasis_API IntWriter
 {
 public:
 	IntWriter(int bfrSizeInBits_);

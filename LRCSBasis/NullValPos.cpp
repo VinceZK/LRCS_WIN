@@ -52,14 +52,14 @@ void NullValPos::set(unsigned int pos_, byte* value_, unsigned short valSize_) {
 	position = pos_;
 }
 
-void NullValPos::set(unsigned int type_, unsigned int pos_, byte* value_) {
+void NullValPos::set(eValueType type_, unsigned int pos_, byte* value_) {
 	//assert(type == ValPos::NOTYPE);
 	//assert(value_ == NULL);
 	type = type_;
 	position = pos_;
 }
 
-void NullValPos::set(unsigned int type_, unsigned int pos_, byte* value_, unsigned short valSize_) {
+void NullValPos::set(eValueType type_, unsigned int pos_, byte* value_, unsigned short valSize_) {
 	//assert(type == ValPos::NOTYPE);
 	//assert(value_ == NULL);
 	type = type_;

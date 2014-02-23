@@ -360,6 +360,8 @@
     <ClInclude Include="StringColumnCreator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ParallelHelper.h">
+      <Filter>Header Files</Filter>
     <ClInclude Include="LRCS_ENV.h">
       <Filter>Header Files\CoreObjects\Util</Filter>
     </ClInclude>
@@ -593,6 +595,11 @@
     <ClCompile Include="Projection.cpp">
       <Filter>Source Files\CoreObjects\Projection</Filter>
     </ClCompile>
+    <ClCompile Include="ParallelHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\UnitTest_Src\TestBlockPrinter.cpp">
+      <Filter>Source Files</Filter>
     <ClCompile Include="LRCS_ENV.cpp">
       <Filter>Source Files\CoreObjects\Util</Filter>
     </ClCompile>

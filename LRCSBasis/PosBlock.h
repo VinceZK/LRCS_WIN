@@ -1,9 +1,16 @@
 #pragma once
+
+#ifdef LRCSBASIS_EXPORTS
+#define LRCSBasis_API __declspec(dllexport)
+#else
+#define LRCSBasis_API __declspec(dllimport)
+#endif
+
 #include "Block.h"
 #include <iostream>
 #include "UnexpectedException.h"
 
-class PosBlock :
+class LRCSBasis_API PosBlock :
 	public Block
 {
 public:

@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "TypeConvert.h"
 
 TypeConvert::TypeConvert()

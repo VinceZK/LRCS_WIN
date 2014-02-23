@@ -1,10 +1,17 @@
 #pragma once
+
+#ifdef LRCSBASIS_EXPORTS
+#define LRCSBasis_API __declspec(dllexport)
+#else
+#define LRCSBasis_API __declspec(dllimport)
+#endif
+
 #include "Block.h"
 #include "CodingException.h"
 #include <iostream>
 #include "MultiPosFilterCursor.h"
 
-class  MultiBlock :
+class LRCSBasis_API MultiBlock :
 	public Block
 {
 public:

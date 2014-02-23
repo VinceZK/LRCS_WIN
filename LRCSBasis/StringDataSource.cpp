@@ -6,32 +6,26 @@ StringDataSource::StringDataSource(AM* am_, bool valSorted_, bool isROS)
 : DataSource(am_, isROS)
 {
 	valSorted = valSorted_;
-	decoder = new StringDecoder(valSorted);
+	m_spDecoder.reset(new StringDecoder(valSorted));
 }
 
 
 StringDataSource::~StringDataSource()
 {
-
-	if (decoder != NULL) {
-		delete decoder;
-		decoder = NULL;
-	}
-
 	//if (currBlock!=NULL) delete currBlock;
 }
 
 //Get the position block on predicaiton
 MultiPosFilterBlock* StringDataSource::getPosOnPred(){
 	matchedPredPos = new MultiPosFilterBlock();
-	if (pred == NULL)matchedPredPos->setCompleteSet(true);
+	if (m_pPred == NULL)matchedPredPos->setCompleteSet(true);
 	else{
 		predChanged = false;//Reset predChanged
 
-		ValPos* rhsvp = pred->getRHS();
+		ValPos* rhsvp = m_pPred->getRHS();
 		char* rhsval = (char*)rhsvp->value;
 		ValPos* tempVP = rhsvp->clone();
-		int valsize = pred->getRHS()->getSize();
+		int valsize = m_pPred->getRHS()->getSize();
 		unsigned char* temp;
 		temp = StringUtil::getSmallestLargerValue(rhsval, valsize);
 		tempVP->set(temp);

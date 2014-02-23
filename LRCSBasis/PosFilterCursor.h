@@ -1,9 +1,15 @@
 #pragma once
+
+#ifdef LRCSBASIS_EXPORTS
+#define LRCSBasis_API __declspec(dllexport)
+#else
+#define LRCSBasis_API __declspec(dllimport)
+#endif
 #include "Cursor.h"
 
 class PosFilterBlock;
 
-class  PosFilterCursor :
+class LRCSBasis_API PosFilterCursor :
 	public Cursor
 {
 public:

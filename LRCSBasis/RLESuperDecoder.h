@@ -5,6 +5,8 @@
 #include "CodingException.h"
 #include "RLEBlock.h"
 
+#pragma warning (disable:4251)
+
 class RLESuperDecoder : public Decoder {
 public:
 	RLESuperDecoder() : Decoder() {}

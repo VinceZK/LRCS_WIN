@@ -1,4 +1,11 @@
 #pragma once
+
+#ifdef LRCSBASIS_EXPORTS
+#define LRCSBasis_API __declspec(dllexport)
+#else
+#define LRCSBasis_API __declspec(dllimport)
+#endif
+
 #include "PosBlock.h"
 #include "assert.h"
 #include <cstring>
@@ -8,7 +15,7 @@
 
 class PosFilterCursor;
 
-class  PosFilterBlock :
+class LRCSBasis_API PosFilterBlock :
 	public PosBlock
 {
 public:
