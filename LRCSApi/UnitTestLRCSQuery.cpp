@@ -26,11 +26,11 @@ TEST_F(TestLRCSQuery, QueryData)
 	param.nDbTableHandle = nDbHandler;
 	param.szTableNames.push_back(_T("StringTest01.ID"));
 	param.szQueryDatas.push_back(_T("abcde99990"));
-	param.ePredicateTypes.push_back(Predicate::OP_GREATER_THAN_OR_EQUAL);
+	param.ePredicateTypes.push_back(LRCSQuery::QueryParam::OP_GREATER_THAN_OR_EQUAL);
 
 	param.szTableNames.push_back(_T("StringTest01.DESC"));
 	param.szQueryDatas.push_back(_T("Cstore00049"));
-	param.ePredicateTypes.push_back(Predicate::OP_LESS_THAN);
+	param.ePredicateTypes.push_back(LRCSQuery::QueryParam::OP_LESS_THAN);
 
 	DWORD dwBeginQuery = ::GetTickCount();
 	QueryResult result = query.QueryData(param);
